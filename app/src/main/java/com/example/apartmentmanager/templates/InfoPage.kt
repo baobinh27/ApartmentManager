@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 
+//Khuôn mẫu các trang chức năng
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoPage(
