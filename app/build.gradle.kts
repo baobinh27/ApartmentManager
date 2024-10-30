@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.apartmentmanager3"
+    namespace = "com.example.apartmentmanager"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.apartmentmanager3"
+        applicationId = "com.example.apartmentmanager"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
