@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3.ui.theme
+package com.example.apartmentmanager.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

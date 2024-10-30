@@ -1,12 +1,12 @@
-package com.example.apartmentmanager3.mainfunctions
+package com.example.apartmentmanager.mainfunctions
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.apartmentmanager3.templates.InfoPage
-import com.example.apartmentmanager3.ui.theme.ApartmentManager3Theme
+import com.example.apartmentmanager.templates.InfoPage
+import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
 //Function 5: Thay đổi thông tin phòng
 @Composable
@@ -29,7 +29,7 @@ fun ModifyRoomPage(
 @Preview(showBackground = true)
 @Composable
 fun ModifyRoomPagePreviewLightMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         ModifyRoomPage(modifier = Modifier, onFunctionChange = {})
     }
 }
@@ -37,7 +37,7 @@ fun ModifyRoomPagePreviewLightMode() {
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ModifyRoomPagePreviewDarkMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         ModifyRoomPage(modifier = Modifier, onFunctionChange = {})
     }
 }

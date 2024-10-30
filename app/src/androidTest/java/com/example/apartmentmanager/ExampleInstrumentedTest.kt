@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3
+package com.example.apartmentmanager
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

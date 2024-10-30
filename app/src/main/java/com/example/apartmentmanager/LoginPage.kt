@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3
+package com.example.apartmentmanager
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.apartmentmanager3.ui.theme.*
+import com.example.apartmentmanager.ui.theme.*
 
 
 
@@ -140,7 +140,7 @@ private fun PasswordBar(password: String, modifier: Modifier = Modifier, onPassw
 @Preview(showBackground = true)
 @Composable
 fun LoginPreviewLightMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         LoginPage(onLoginClick = {})
     }
 }
@@ -148,7 +148,7 @@ fun LoginPreviewLightMode() {
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun LoginPreviewDarkMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         LoginPage(onLoginClick = {})
     }
 }

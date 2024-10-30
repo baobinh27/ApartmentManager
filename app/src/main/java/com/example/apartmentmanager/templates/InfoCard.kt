@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3.templates
+package com.example.apartmentmanager.templates
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height

@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3
+package com.example.apartmentmanager
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,13 +12,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.apartmentmanager3.ui.theme.ApartmentManager3Theme
+import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ApartmentManager3Theme {
+            ApartmentManagerTheme {
                 MainNavigation(modifier = Modifier.fillMaxWidth())
             }
         }
@@ -44,7 +44,7 @@ fun MainNavigation(
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         MainNavigation(modifier = Modifier.fillMaxWidth())
     }
 }

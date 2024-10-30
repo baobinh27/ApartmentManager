@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3
+package com.example.apartmentmanager
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -7,8 +7,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.apartmentmanager3.ui.theme.ApartmentManager3Theme
-import com.example.apartmentmanager3.mainfunctions.*
+import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
+import com.example.apartmentmanager.mainfunctions.*
 
 @Composable
 fun MainApp(
@@ -33,7 +33,7 @@ fun MainApp(
 @Preview(showBackground = true)
 @Composable
 fun MainAppPreviewLightMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         MainApp(modifier = Modifier, onLogOut = {})
     }
 }
@@ -41,7 +41,7 @@ fun MainAppPreviewLightMode() {
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun MainAppPreviewDarkMode() {
-    ApartmentManager3Theme {
+    ApartmentManagerTheme {
         MainApp(modifier = Modifier, onLogOut = {})
     }
 }

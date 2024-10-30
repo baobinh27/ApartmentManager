@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3.mainfunctions
+package com.example.apartmentmanager.mainfunctions
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.apartmentmanager3.ui.theme.ApartmentManager3Theme
+import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
-//Function 4: Báo cáo tài chính
+//Function 1: Thông tin chung cư
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinancialReportPage(
+fun ApartmentInfoPage(
     modifier: Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
@@ -36,7 +36,7 @@ fun FinancialReportPage(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Financial Report", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = "Apartment Information", color = MaterialTheme.colorScheme.onPrimary)
                 },
                 navigationIcon = {
                     IconButton(onClick = { onFunctionChange(0) }) {
@@ -53,33 +53,28 @@ fun FinancialReportPage(
         content = { innerPadding ->
             Column(
                 modifier = modifier
-                    .padding(
-                        top = innerPadding.calculateTopPadding() + extraPadding,
-                        bottom = 0.dp,
-                        start = extraPadding,
-                        end = extraPadding
-                    )
+                    .padding(top = innerPadding.calculateTopPadding() + extraPadding, bottom = 0.dp, start = extraPadding, end = extraPadding)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
                 Text(text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum egestas dui sit amet scelerisque. Cras aliquet mollis mattis. Cras et mi enim. Nam aliquam urna eu condimentum commodo. Praesent ultrices ligula a feugiat scelerisque. Donec dictum, nulla at viverra euismod, erat sapien varius orci, condimentum hendrerit sapien mi vel enim. Donec dictum consectetur nisi quis molestie. Pellentesque ut metus urna. Nullam elementum purus quis pellentesque congue. Vivamus ipsum lorem, rhoncus eget porta ac, elementum id arcu. Vestibulum nec porta tellus, eu feugiat magna. Maecenas nec est lacinia, vulputate odio at, molestie dui.")
             }
-        },
+        }
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun FinancialReportPagePreviewLightMode() {
-    ApartmentManager3Theme {
-        FinancialReportPage(modifier = Modifier, onFunctionChange = {})
+fun ApartmentInfoPagePreviewLightMode() {
+    ApartmentManagerTheme {
+        ApartmentInfoPage(modifier = Modifier, onFunctionChange = {})
     }
 }
 
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun FinancialReportPagePreviewDarkMode() {
-    ApartmentManager3Theme {
-        FinancialReportPage(modifier = Modifier, onFunctionChange = {})
+fun ApartmentInfoPagePreviewDarkMode() {
+    ApartmentManagerTheme {
+        ApartmentInfoPage(modifier = Modifier, onFunctionChange = {})
     }
 }

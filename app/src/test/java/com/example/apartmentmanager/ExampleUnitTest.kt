@@ -1,4 +1,4 @@
-package com.example.apartmentmanager3
+package com.example.apartmentmanager
 
 import org.junit.Test
 
