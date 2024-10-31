@@ -23,8 +23,8 @@ fun MainApp(
         3 -> RentStatusPage(modifier, onFunctionChange = { function = 0 })
         4 -> FinancialReportPage(modifier, onFunctionChange = { function = 0 })
         5 -> ModifyRoomPage(modifier, onFunctionChange = { function = 0 })
-        6 -> {}
-        7 -> {}
+        6 -> ReportPage(modifier, onFunctionChange = { function = 0 })
+        7 -> SettingsPage(modifier, onFunctionChange = { function = 0 })
     }
 
 }
