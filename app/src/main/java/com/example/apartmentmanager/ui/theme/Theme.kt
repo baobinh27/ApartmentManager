@@ -18,6 +18,10 @@ private val DarkColorScheme = darkColorScheme(
 
     tertiaryContainer = Gray30,
     onTertiaryContainer = Gray50,
+
+    errorContainer = DarkRed,
+    error = Gray130,
+
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,6 +36,9 @@ private val LightColorScheme = lightColorScheme(
 
     tertiaryContainer = LightBlue,
     onTertiaryContainer = BrightBlue,
+
+    errorContainer = LightRed,
+    error = Black
 
 
 

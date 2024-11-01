@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
+//App bắt đầu tại đây
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,22 +26,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//Hàm này quyết định xem trang đăng nhập hay giao diện chính của app sẽ được sử dụng
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier
 ) {
+    //Biến này là một trạng thái (state) để cho app biết sẽ xuất hiện phần tử nào
     var onLogin by rememberSaveable { mutableStateOf(true) }
     Surface (
         modifier = modifier
     ) {
+        //Mặc định xuất hiện trang đăng nhập
         if (onLogin) {
+            //Truyền vào một hàm, hàm này sẽ làm thay đổi state bên trên, làm cho hàm này được chạy lại và xuất hiện menu chính
+            //onLoginClick sẽ được đặt trong nút Sign in
             LoginPage(onLoginClick = { onLogin = !onLogin })
         } else {
+            //Hàm onLogOut sẽ được đặt trong nút đăng xuất để quay lại màn hình đăng nhập
             MainApp(onLogOut = {onLogin = !onLogin})
         }
     }
 }
 
+//Hàm này chỉ dùng để xem trước giao diện mà không cần chạy lại app
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() {

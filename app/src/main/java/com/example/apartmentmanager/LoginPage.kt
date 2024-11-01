@@ -3,6 +3,8 @@ package com.example.apartmentmanager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.ui.theme.*
 
-
+//Giao diện trang đăng nhập
 @Composable
 fun LoginPage(
     modifier: Modifier = Modifier,
@@ -27,6 +29,7 @@ fun LoginPage(
     //TODO: validate username and password and enable login button
     //val filled = username.isNotEmpty() && password.isNotEmpty()
     val filled = true
+    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -65,22 +68,32 @@ fun LoginPage(
 
             // Các nút đăng nhập và đăng ký
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 OutlinedButton(
-                    onClick = {}
+                    //Để test phần nhập lỗi tên tài khoản hoặc mật khẩu
+                    //TODO: Xử lý lại sau khi đã thực hiện xác thực tài khoản
+                    onClick = {showErrorDialog = true}
                 ) {
                     Text("Sign up")
                 }
 
                 Button(
-                    onClick = onLoginClick,
+                    onClick = {
+                        if (isValid(username, password)) onLoginClick() else {
+                            showErrorDialog = false
+                        }
+                    },
                     enabled = filled
                 ) {
                     Text("Sign in")
                 }
             }
+
+            //Quên mật khẩu
             Text(
                 text = "Forgot password?",
                 modifier = Modifier.padding(top = 10.dp),
@@ -88,6 +101,31 @@ fun LoginPage(
                 fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodySmall
             )
+            if (showErrorDialog) {
+                ElevatedCard(
+                    modifier = modifier
+                        .height(150.dp)
+                        .width(300.dp)
+                        .padding(top = 30.dp),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    IconButton(
+                        onClick = { showErrorDialog = false },
+                        modifier = modifier.align(Alignment.End)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close dialog",
+                        )
+                    }
+                    Text(
+                        text = "Username or password invalid!",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = modifier.padding(horizontal = 20.dp)
+                    )
+                }
+            }
+
         }
     }
 }
@@ -95,7 +133,11 @@ fun LoginPage(
 
 //Trường nhập tên đăng nhập
 @Composable
-private fun UsernameBar(username: String, modifier: Modifier = Modifier, onUsernameChange: (String) -> Unit) {
+private fun UsernameBar(
+    username: String,
+    modifier: Modifier = Modifier,
+    onUsernameChange: (String) -> Unit
+) {
     TextField(
         shape = ShapeDefaults.ExtraLarge,
         value = username,
@@ -116,7 +158,11 @@ private fun UsernameBar(username: String, modifier: Modifier = Modifier, onUsern
 
 //Trường nhập mật khẩu
 @Composable
-private fun PasswordBar(password: String, modifier: Modifier = Modifier, onPasswordChange: (String) -> Unit) {
+private fun PasswordBar(
+    password: String,
+    modifier: Modifier = Modifier,
+    onPasswordChange: (String) -> Unit
+) {
     TextField(
         shape = ShapeDefaults.ExtraLarge,
         value = password,
@@ -134,6 +180,10 @@ private fun PasswordBar(password: String, modifier: Modifier = Modifier, onPassw
     )
 }
 
+fun isValid(username: String, password: String): Boolean {
+    //Xử lý thông tin đăng nhập ở đây
+    return true
+}
 
 
 @Preview(showBackground = true)

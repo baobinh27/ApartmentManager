@@ -52,6 +52,7 @@ fun HomePage(
             FlowRow(
                 modifier = Modifier.padding(top = screenWidth * 0.05f)
             ) {
+                //Các thẻ chức năng xuất hiện trong menu
                 ApartmentInfoCard(onFunctionChange)
                 RoomInfoCard(onFunctionChange)
                 RentStatusCard(onFunctionChange)
@@ -65,6 +66,7 @@ fun HomePage(
     }
 }
 
+//40% màn hình bên trên của menu để hiện các thông tin chính
 @Composable
 fun HeaderPane(
     modifier: Modifier,

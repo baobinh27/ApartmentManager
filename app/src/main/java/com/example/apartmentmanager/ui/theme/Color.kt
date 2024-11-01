@@ -37,3 +37,6 @@ val Gray110 = Color(0xFFBBBBBB)
 val Gray120 = Color(0xFFCCCCCC)
 val Gray130 = Color(0xFFDDDDEE)     //onPrimary
 val Gray140 = Color(0xFFEEEEFF)     //onSecondary
+
+val LightRed = Color(0xFFFF8C8C)    //error pane
+val DarkRed = Color(0xFF8C0000)

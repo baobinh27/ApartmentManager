@@ -10,12 +10,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 import com.example.apartmentmanager.mainfunctions.*
 
+//Giống hàm MainNavigation, hàm này quyết định xem chức năng nào sẽ được hiển thị
 @Composable
 fun MainApp(
     modifier: Modifier = Modifier,
     onLogOut: () -> Unit
 ) {
+    //Chức năng mặc định = 0 (HomePage / Menu)
     var function by rememberSaveable { mutableIntStateOf(0) }
+    //when ~ switch
     when (function) {
         0 -> HomePage(modifier, onLogOut, onFunctionChange = { function = it })
         1 -> ApartmentInfoPage(modifier, onFunctionChange = { function = 0 })
@@ -26,7 +29,9 @@ fun MainApp(
         6 -> ReportPage(modifier, onFunctionChange = { function = 0 })
         7 -> SettingsPage(modifier, onFunctionChange = { function = 0 })
     }
-
+    //onFunctionChange để giúp điều hướng
+    //ở HomePage, truyền vào onFunctionChange để gắn cho từng thẻ điều hướng chức năng
+    //các chức năng khác mặc định sử dụng function = 0 gắn cho nút quay lại menu
 }
 
 
