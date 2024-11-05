@@ -16,6 +16,9 @@ private val DarkColorScheme = darkColorScheme(
     background = Gray10,
     onBackground = Gray130,
 
+    tertiary = Gray20,
+    onTertiary = Gray130,
+
     tertiaryContainer = Gray30,
     onTertiaryContainer = Gray50,
 
@@ -33,6 +36,9 @@ private val LightColorScheme = lightColorScheme(
 
     background = Background,
     onBackground = Black,
+
+    tertiary = BrightBlue,
+    onTertiary = Gray10,
 
     tertiaryContainer = LightBlue,
     onTertiaryContainer = BrightBlue,

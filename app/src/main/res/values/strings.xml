@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ApartmentManager</string>
+    <string name="app_name" translatable="false">ApartmentManager</string>
+    <string name="Welcome"></string>
+    <string name="Settings"></string>
 </resources>
