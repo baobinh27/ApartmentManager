@@ -2,6 +2,10 @@ package com.example.apartmentmanager.mainfunctions
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,22 +46,29 @@ fun SettingsPage(
         ) {
             Text("Language")
         }
-        if (showLanguageSetting) {
-            ItemListChild(
-                onClick = {
-                    selectedLanguage = "en"
-                },
-                modifier = Modifier
-            ) {
-                Text("English")
-            }
-            ItemListChild(
-                onClick = {
-                    selectedLanguage = "vi"
-                },
-                modifier = Modifier
-            ) {
-                Text("Tiếng Việt")
+        AnimatedVisibility(
+            visible = showLanguageSetting,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column {
+                ItemListChild(
+                    onClick = {
+                        selectedLanguage = "en"
+                    },
+                    modifier = Modifier
+                ) {
+                    Text("English")
+                }
+                ItemListChild(
+                    onClick = {
+                        selectedLanguage = "vi"
+                    },
+                    modifier = Modifier
+                ) {
+                    Text("Tiếng Việt")
+                }
             }
         }
         ItemList(
@@ -66,24 +77,31 @@ fun SettingsPage(
         ) {
             Text("Theme")
         }
-        if (showThemeSetting) {
-            ItemListChild(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-            ) {
-                Text("Light")
-            }
-            ItemListChild(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-            ) {
-                Text("Dark")
-            }
-            ItemListChild(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-            ) {
-                Text("System")
+        AnimatedVisibility(
+            visible = showThemeSetting,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column {
+                ItemListChild(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                ) {
+                    Text("Light")
+                }
+                ItemListChild(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                ) {
+                    Text("Dark")
+                }
+                ItemListChild(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                ) {
+                    Text("System")
+                }
             }
         }
         ItemList(

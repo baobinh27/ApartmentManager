@@ -3,6 +3,9 @@ package com.example.apartmentmanager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -36,13 +39,17 @@ fun MainNavigation(
     Surface (
         modifier = modifier
     ) {
-        //Mặc định xuất hiện trang đăng nhập
-        if (onLogin) {
-            //Truyền vào một hàm, hàm này sẽ làm thay đổi state bên trên, làm cho hàm này được chạy lại và xuất hiện menu chính
-            //onLoginClick sẽ được đặt trong nút Sign in
+        AnimatedVisibility(
+            visible = onLogin,
+            enter = slideInHorizontally(initialOffsetX = { -it }),
+            exit = slideOutHorizontally(targetOffsetX = { -it })
+        ) {
             LoginPage(onLoginClick = { onLogin = !onLogin })
-        } else {
-            //Hàm onLogOut sẽ được đặt trong nút đăng xuất để quay lại màn hình đăng nhập
+        }
+        AnimatedVisibility(
+            visible = !onLogin,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })) {
             MainApp(onLogOut = {onLogin = !onLogin})
         }
     }

@@ -1,5 +1,8 @@
 package com.example.apartmentmanager
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -101,7 +104,21 @@ fun LoginPage(
                 fontFamily = FontFamily.SansSerif,
                 style = MaterialTheme.typography.bodySmall
             )
-            if (showErrorDialog) {
+
+            //Thông báo nhập sai tên đăng nhập hoặc mật khẩu
+            // Phần bên trong LaunchedEffect sẽ chạy dưới nền, bắt đầu từ khi có thông báo lỗi
+            LaunchedEffect(showErrorDialog) {
+                if (showErrorDialog) {
+                    //Đợi 2 giây trước khi ẩn thông báo lỗi
+                    kotlinx.coroutines.delay(2000)
+                    showErrorDialog = false
+                }
+            }
+            AnimatedVisibility(
+                visible = showErrorDialog,
+                //Tạo hiệu ứng xuất hiện và biến mất
+                exit = fadeOut(tween(1000))
+            ) {
                 ElevatedCard(
                     modifier = modifier
                         .height(150.dp)
