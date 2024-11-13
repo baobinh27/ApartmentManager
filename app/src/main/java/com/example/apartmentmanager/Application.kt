@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,23 +35,34 @@ class MainActivity : ComponentActivity() {
 fun MainNavigation(
     modifier: Modifier = Modifier
 ) {
-    //Biến này là một trạng thái (state) để cho app biết sẽ xuất hiện phần tử nào
-    var onLogin by rememberSaveable { mutableStateOf(true) }
+    //Biến này là một trạng thái (state) để cho app biết xuất hiện trang nào
+    //role cho biết đối tượng nào đang đăng nhập (chủ nhà, quản lý, cư dân)
+    var role by rememberSaveable { mutableIntStateOf(0) }
+    var userID by rememberSaveable { mutableStateOf("") }
     Surface (
         modifier = modifier
     ) {
         AnimatedVisibility(
-            visible = onLogin,
+            visible = role == 0, //Nếu role = 0 thì hiển thị trang đăng nhập
             enter = slideInHorizontally(initialOffsetX = { -it }),
             exit = slideOutHorizontally(targetOffsetX = { -it })
         ) {
-            LoginPage(onLoginClick = { onLogin = !onLogin })
+            LoginPage(onLoginClick = { r, id ->
+                role = r
+                userID = id
+            })
         }
         AnimatedVisibility(
-            visible = !onLogin,
+            visible = role == 1, //Nếu role = 1 thì hiển thị giao diện của cư dân
             enter = slideInHorizontally(initialOffsetX = { it }),
             exit = slideOutHorizontally(targetOffsetX = { it })) {
-            MainApp(onLogOut = {onLogin = !onLogin})
+            TenantApp(onLogOut = { role = 0 })
+        }
+        AnimatedVisibility(
+            visible = role == 2, //Nếu role = 2 thì hiển thị giao diện của quản lý
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })) {
+            ManagerApp(onLogOut = { role = 0 })
         }
     }
 }

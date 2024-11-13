@@ -1,12 +1,9 @@
-package com.example.apartmentmanager.mainfunctions
+package com.example.apartmentmanager.tenantapp
 
-import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,14 +12,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.ItemList
 import com.example.apartmentmanager.templates.ItemListChild
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
-import com.example.apartmentmanager.util.LocaleManager
+import com.example.apartmentmanager.ui.theme.Red
 
 
 //Function 7: Cài đặt
@@ -121,6 +116,15 @@ fun SettingsPage(
             modifier = Modifier
         ) {
             Text("Change password")
+        }
+        ItemList(
+            onClick = { /*TODO*/ },
+            modifier = Modifier
+        ) {
+            Text(
+                text = "Request to leave apartment",
+                color = Red
+            )
         }
     }
 }

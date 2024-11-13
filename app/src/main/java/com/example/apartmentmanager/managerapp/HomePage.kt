@@ -1,4 +1,4 @@
-package com.example.apartmentmanager.mainfunctions
+package com.example.apartmentmanager.managerapp
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -54,12 +54,6 @@ fun HomePage(
             ) {
                 //Các thẻ chức năng xuất hiện trong menu
                 ApartmentInfoCard(onFunctionChange)
-                RoomInfoCard(onFunctionChange)
-                RentStatusCard(onFunctionChange)
-                FinancialReportCard(onFunctionChange)
-                ModifyInfoCard(onFunctionChange)
-                SendReportCard(onFunctionChange)
-                SettingsCard(onFunctionChange)
             }
 
         }

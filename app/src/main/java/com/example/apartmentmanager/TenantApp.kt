@@ -1,10 +1,8 @@
 package com.example.apartmentmanager
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
@@ -13,11 +11,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
-import com.example.apartmentmanager.mainfunctions.*
+import com.example.apartmentmanager.tenantapp.*
 
 //Giống hàm MainNavigation, hàm này quyết định xem chức năng nào sẽ được hiển thị
 @Composable
-fun MainApp(
+fun TenantApp(
     modifier: Modifier = Modifier,
     onLogOut: () -> Unit
 ) {
@@ -96,16 +94,16 @@ fun MainApp(
 
 @Preview(showBackground = true)
 @Composable
-fun MainAppPreviewLightMode() {
+fun TenantAppPreviewLightMode() {
     ApartmentManagerTheme {
-        MainApp(modifier = Modifier, onLogOut = {})
+        TenantApp(modifier = Modifier, onLogOut = {})
     }
 }
 
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun MainAppPreviewDarkMode() {
+fun TenantAppPreviewDarkMode() {
     ApartmentManagerTheme {
-        MainApp(modifier = Modifier, onLogOut = {})
+        TenantApp(modifier = Modifier, onLogOut = {})
     }
 }

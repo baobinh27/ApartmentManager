@@ -1,5 +1,7 @@
 package com.example.apartmentmanager
 
+import android.util.Log
+import android.widget.ProgressBar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -13,26 +15,31 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.ui.theme.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 //Giao diện trang đăng nhập
 @Composable
 fun LoginPage(
     modifier: Modifier = Modifier,
-    onLoginClick: () -> Unit
+    onLoginClick: (Int, String) -> Unit
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    //TODO: validate username and password and enable login button
-    //val filled = username.isNotEmpty() && password.isNotEmpty()
-    val filled = true
+    var loading by rememberSaveable { mutableStateOf(false) }
+    val filled = username.isNotEmpty() && password.isNotEmpty()
     var showErrorDialog by rememberSaveable { mutableStateOf(false) }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -76,23 +83,44 @@ fun LoginPage(
                     .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
+                // Nút đăng ký
                 OutlinedButton(
-                    //Để test phần nhập lỗi tên tài khoản hoặc mật khẩu
-                    //TODO: Xử lý lại sau khi đã thực hiện xác thực tài khoản
-                    onClick = {showErrorDialog = true}
+                    onClick = { },
+                    modifier = Modifier.width(screenWidth * 0.25f)
                 ) {
                     Text("Sign up")
                 }
 
+                // Nút đăng nhập
                 Button(
                     onClick = {
-                        if (isValid(username, password)) onLoginClick() else {
-                            showErrorDialog = false
+                        loading = true
+                        isValid(username, password) { role, userID ->
+                            loading = false
+                            when (role) {
+                                0 -> {
+                                    showErrorDialog = true
+                                }
+                                else -> {
+                                    onLoginClick(role, userID)
+                                }
+                            }
                         }
                     },
+                    modifier = Modifier.width(screenWidth * 0.25f),
+                    // Chỉ nhấn được khi đã nhập cả username và password
                     enabled = filled
                 ) {
-                    Text("Sign in")
+                    if (loading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Sign In",
+                        )
+                    }
                 }
             }
 
@@ -155,6 +183,7 @@ private fun UsernameBar(
     modifier: Modifier = Modifier,
     onUsernameChange: (String) -> Unit
 ) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     TextField(
         shape = ShapeDefaults.ExtraLarge,
         value = username,
@@ -168,7 +197,7 @@ private fun UsernameBar(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent
         ),
-        modifier = modifier.padding(vertical = 10.dp)
+        modifier = modifier.padding(vertical = 10.dp).width(screenWidth * 0.8f)
     )
 }
 
@@ -180,26 +209,77 @@ private fun PasswordBar(
     modifier: Modifier = Modifier,
     onPasswordChange: (String) -> Unit
 ) {
-    TextField(
-        shape = ShapeDefaults.ExtraLarge,
-        value = password,
-        onValueChange = onPasswordChange,
-        placeholder = { Text("Your password...") },
-        label = { Text("Password") },
-        singleLine = true,
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent
-        ),
-        modifier = modifier.padding(vertical = 10.dp)
-    )
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+    Row(
+        modifier = Modifier.width(screenWidth * 0.8f),
+    ) {
+        TextField(
+            shape = ShapeDefaults.ExtraLarge,
+            value = password,
+            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+            onValueChange = onPasswordChange,
+            placeholder = { Text("Your password...") },
+            label = { Text("Password") },
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            ),
+            modifier = modifier.padding(vertical = 10.dp).width(screenWidth * 0.6f)
+        )
+
+        Spacer(modifier = Modifier.width(screenWidth * 0.04f))
+        // Nút hiển thị mật khẩu
+        IconButton(
+            onClick = { showPassword = !showPassword },
+            modifier = modifier.align(Alignment.CenterVertically).scale(1.2f)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (showPassword) R.drawable.show_password else R.drawable.hide_password),
+                contentDescription = "Show password",
+                tint = MaterialTheme.colorScheme.onTertiary,
+            )
+        }
+    }
+
 }
 
-fun isValid(username: String, password: String): Boolean {
-    //Xử lý thông tin đăng nhập ở đây
-    return true
+// Kiểm tra tên đăng nhập và mật khẩu có hợp lệ hay không
+fun isValid(username: String, password: String, onResult: (Int, String) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("authentication")
+    var userID = ""
+
+    userRef.get()
+        .addOnSuccessListener { result ->
+            var isValid = false
+            for (document in result) {
+                if (document.getString("username") == username && document.getString("password") == password) {
+                    isValid = true
+                    userID = document.id
+                    break
+                }
+            }
+            if (userID.isNotEmpty()) {
+                when (userID[0]) {
+                    'T' -> onResult(1, userID)
+                    'M' -> onResult(2, userID)
+                    'O' -> onResult(3, userID)
+                    else -> onResult(0, "") // Trả về 0 nếu không hợp lệ
+                }
+            } else {
+                onResult(0, "") // Không tìm thấy tài khoản phù hợp
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Thông báo lỗi ra logcat nếu có
+            Log.d("Firestore", "Error getting documents: ", exception)
+            onResult(0, "") // Trả về false nếu có lỗi xảy ra
+        }
 }
 
 
@@ -207,7 +287,7 @@ fun isValid(username: String, password: String): Boolean {
 @Composable
 fun LoginPreviewLightMode() {
     ApartmentManagerTheme {
-        LoginPage(onLoginClick = {})
+        LoginPage(onLoginClick = { _, _ -> })
     }
 }
 
@@ -215,6 +295,6 @@ fun LoginPreviewLightMode() {
 @Composable
 fun LoginPreviewDarkMode() {
     ApartmentManagerTheme {
-        LoginPage(onLoginClick = {})
+        LoginPage(onLoginClick = { _, _ -> })
     }
 }
