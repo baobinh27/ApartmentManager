@@ -44,6 +44,13 @@ val Typography = Typography(
         fontSize = 18.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

@@ -53,9 +53,7 @@ fun InfoPage(
             Column(
                 modifier = modifier
                     .padding(
-                        top = innerPadding.calculateTopPadding() + extraPadding,
-                        start = extraPadding,
-                        end = extraPadding
+                        top = innerPadding.calculateTopPadding()
                     )
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState()),

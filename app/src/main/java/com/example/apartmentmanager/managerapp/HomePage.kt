@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -123,69 +124,11 @@ fun HeaderPane(
 fun ApartmentInfoCard(onFunctionChange: (Int) -> Unit) {
     InfoCard(
         icon = Icons.TwoTone.Info,
+        painter = null,
+        scale = 2f,
         title = "Apartment Information",
-        onFunctionChange = onFunctionChange,
-        functionId = 1
-    )
-}
-
-@Composable
-fun RoomInfoCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.AccountBox,
-        title = "Room Information",
-        onFunctionChange = onFunctionChange,
-        functionId = 2
-    )
-}
-
-@Composable
-fun RentStatusCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.Create,
-        title = "Rent Status",
-        onFunctionChange = onFunctionChange,
-        functionId = 3
-    )
-}
-
-@Composable
-fun FinancialReportCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.DateRange,
-        title = "Financial Report",
-        onFunctionChange = onFunctionChange,
-        functionId = 4
-    )
-}
-
-@Composable
-fun ModifyInfoCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.Edit,
-        title = "Modify Room Information",
-        onFunctionChange = onFunctionChange,
-        functionId = 5
-    )
-}
-
-@Composable
-fun SendReportCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.Warning,
-        title = "Send Report",
-        onFunctionChange = onFunctionChange,
-        functionId = 6
-    )
-}
-
-@Composable
-fun SettingsCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = Icons.TwoTone.Settings,
-        title = "Settings",
-        onFunctionChange = onFunctionChange,
-        functionId = 7
+        onClick = {onFunctionChange(1)},
+        tint = Color.Gray
     )
 }
 

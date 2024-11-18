@@ -89,6 +89,13 @@ fun TenantApp(
     ) {
         SettingsPage(modifier, onFunctionChange = { function = 0 })
     }
+    AnimatedVisibility(
+        visible = function == 8,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        NotificationPage(modifier, onFunctionChange = { function = 0 })
+    }
 }
 
 

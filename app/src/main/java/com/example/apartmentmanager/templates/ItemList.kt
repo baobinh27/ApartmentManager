@@ -26,7 +26,7 @@ fun ItemList(
         onClick = onClick,
         shape = ShapeDefaults.ExtraSmall,
         border = BorderStroke(0.dp, MaterialTheme.colorScheme.background),
-        modifier = Modifier.fillMaxWidth().height(screenWidth * 0.15f).padding(top = 10.dp),
+        modifier = modifier.fillMaxWidth().height(screenWidth * 0.15f).padding(top = 10.dp),
         content = content,
         colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
             containerColor = MaterialTheme.colorScheme.secondary,

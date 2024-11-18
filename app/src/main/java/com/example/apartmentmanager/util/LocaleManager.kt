@@ -7,7 +7,6 @@ import java.util.Locale
 
 //Hàm này dùng để thay đổi ngôn ngữ, tạm thời chưa hoàn thiện
 class LocaleManager(private val context: Context) {
-
     fun setLocale(languageCode: String): Context {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
