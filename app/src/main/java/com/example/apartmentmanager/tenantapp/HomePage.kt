@@ -217,10 +217,10 @@ fun SettingBar(
     onFunctionChange: (Int) -> Unit
 ) {
     InfoCardBar(
-        icon = Icons.TwoTone.Settings,
-        tint = MaterialTheme.colorScheme.onSecondary,
+        icon1 = Icons.TwoTone.Settings,
+        tint1 = MaterialTheme.colorScheme.onSecondary,
         title = "Settings",
-        size = 0.07f,
+        size1 = 0.07f,
         onClick = {onFunctionChange(7)}
     )
 }
@@ -230,9 +230,9 @@ fun LogOutBar(
     onLogOut: () -> Unit
 ) {
     InfoCardBar(
-        icon = Icons.TwoTone.ExitToApp,
-        tint = Red,
-        size = 0.07f,
+        icon1 = Icons.TwoTone.ExitToApp,
+        tint1 = Red,
+        size1 = 0.07f,
         textColor = Color.Red,
         title = "Log out",
         onClick = onLogOut

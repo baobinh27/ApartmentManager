@@ -258,7 +258,9 @@ fun isValid(username: String, password: String, onResult: (Int, String) -> Unit)
         .addOnSuccessListener { result ->
             var isValid = false
             for (document in result) {
-                if (document.getString("username") == username && document.getString("password") == password) {
+                if (document.getString("username") == username &&
+                    document.getString("password") == password &&
+                    document.getBoolean("isActive") == true) {
                     isValid = true
                     userID = document.id
                     break

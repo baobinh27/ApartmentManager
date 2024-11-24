@@ -8,8 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.icons.twotone.Info
 import androidx.compose.material.icons.twotone.Lock
-import androidx.compose.material.icons.twotone.Notifications
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,10 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
-import com.example.apartmentmanager.templates.ItemList
 import com.example.apartmentmanager.templates.ItemListChild
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
-import com.example.apartmentmanager.ui.theme.Red
 
 
 //Function 7: Cài đặt
@@ -43,9 +39,9 @@ fun SettingsPage(
         modifier = modifier
     ) {
         InfoCardBar(
-            painter = painterResource(com.example.apartmentmanager.R.drawable.language),
-            tint = Color.Unspecified,
-            size = 0.07f,
+            painter1 = painterResource(com.example.apartmentmanager.R.drawable.language),
+            tint1 = Color.Unspecified,
+            size1 = 0.07f,
             title = "Language",
             onClick = { showLanguageSetting = !showLanguageSetting }
         )
@@ -74,9 +70,9 @@ fun SettingsPage(
             }
         }
         InfoCardBar(
-            painter = painterResource(com.example.apartmentmanager.R.drawable.theme),
-            tint = Color.Unspecified,
-            size = 0.07f,
+            painter1 = painterResource(com.example.apartmentmanager.R.drawable.theme),
+            tint1 = Color.Unspecified,
+            size1 = 0.07f,
             title = "Theme",
             onClick = { showThemeSetting = !showThemeSetting }
         )
@@ -105,30 +101,30 @@ fun SettingsPage(
             }
         }
         InfoCardBar(
-            painter = painterResource(com.example.apartmentmanager.R.drawable.notifications),
-            tint = Color.Unspecified,
-            size = 0.07f,
+            painter1 = painterResource(com.example.apartmentmanager.R.drawable.notifications),
+            tint1 = Color.Unspecified,
+            size1 = 0.07f,
             title = "Notifications",
             onClick = { }
         )
         InfoCardBar(
-            icon = Icons.TwoTone.Info,
-            tint = Color.Black,
-            size = 0.07f,
+            icon1 = Icons.TwoTone.Info,
+            tint1 = Color.Black,
+            size1 = 0.07f,
             title = "About",
             onClick = { }
         )
         InfoCardBar(
-            icon = Icons.TwoTone.Lock,
-            tint = Color.Black,
-            size = 0.07f,
+            icon1 = Icons.TwoTone.Lock,
+            tint1 = Color.Black,
+            size1 = 0.07f,
             title = "Change password",
             onClick = { }
         )
         InfoCardBar(
-            icon = Icons.TwoTone.Delete,
-            tint = Color.Black,
-            size = 0.07f,
+            icon1 = Icons.TwoTone.Delete,
+            tint1 = Color.Black,
+            size1 = 0.07f,
             textColor = Color.Red,
             title = "Request to leave apartment",
             onClick = { }

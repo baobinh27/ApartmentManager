@@ -14,23 +14,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 //Khuôn mẫu các thẻ chức năng
 @Composable
 fun InfoCardBar(
-    icon: ImageVector? = null,
-    painter: Painter? = null,
-    tint: Color,
-    size: Float = 0.2f,
+    icon1: ImageVector? = null,
+    painter1: Painter? = null,
+    tint1: Color = Color.Unspecified,
+    size1: Float = 0.2f,
     textColor: Color = MaterialTheme.colorScheme.onSecondary,
     title: String,
+    icon2: ImageVector? = null,
+    painter2: Painter? = null,
+    tint2: Color = Color.Unspecified,
+    size2: Float = 0.2f,
     onClick: () -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -51,30 +53,48 @@ fun InfoCardBar(
             modifier = Modifier.padding(cardPadding).align(Alignment.Start),
             verticalAlignment = Alignment.CenterVertically // Căn giữa các phần tử theo chiều dọc
         ) {
-            if (icon != null) {
+            if (icon1 != null) {
                 Icon(
-                    imageVector = icon,
+                    imageVector = icon1,
                     contentDescription = title,
-                    modifier = Modifier.height(screenWidth * size).width(screenWidth * size),
-                    tint = tint
+                    modifier = Modifier.height(screenWidth * size1).width(screenWidth * size1),
+                    tint = tint1
                 )
             }
-            if (painter != null) {
+            if (painter1 != null) {
                 Icon(
-                    painter = painter,
+                    painter = painter1,
                     contentDescription = title,
-                    modifier = Modifier.height(screenWidth * size).width(screenWidth * size),
-                    tint = tint
+                    modifier = Modifier.height(screenWidth * size1).width(screenWidth * size1),
+                    tint = tint1
                 )
             }
-
-            Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+            if (icon1 != null || painter1 != null) {
+                Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 color = textColor,
             )
+            Spacer(modifier = Modifier.weight(1f))
+            if (icon2 != null) {
+                Icon(
+                    imageVector = icon2,
+                    contentDescription = title,
+                    modifier = Modifier.height(screenWidth * size2).width(screenWidth * size2),
+                    tint = tint2,
+                )
+            }
+            if (painter2 != null) {
+                Icon(
+                    painter = painter2,
+                    contentDescription = title,
+                    modifier = Modifier.height(screenWidth * size2).width(screenWidth * size2),
+                    tint = tint2
+                )
+            }
         }
     }
 }

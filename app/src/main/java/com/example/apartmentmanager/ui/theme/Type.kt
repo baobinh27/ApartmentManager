@@ -11,11 +11,25 @@ import androidx.compose.ui.unit.sp
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
