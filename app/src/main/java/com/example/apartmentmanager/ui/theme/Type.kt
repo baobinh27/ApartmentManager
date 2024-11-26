@@ -38,9 +38,16 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
-    headlineSmall = TextStyle(
+    headlineMedium = TextStyle(
         fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
         fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily(Font(familyName = DeviceFontFamilyName("Open Sans"))),
+        fontWeight = FontWeight.Normal,
         fontSize = 24.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp

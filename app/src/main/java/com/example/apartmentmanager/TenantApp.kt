@@ -45,56 +45,56 @@ fun TenantApp(
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ApartmentInfoPage(modifier, onFunctionChange = { function = 0 })
+        ApartmentInfoPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 2,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        RoomInfoPage(modifier, onFunctionChange = { function = 0 })
+        RoomInfoPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 3,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        RentStatusPage(modifier, onFunctionChange = { function = 0 })
+        RentStatusPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 4,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        FinancialReportPage(modifier, onFunctionChange = { function = 0 })
+        FinancialReportPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 5,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ModifyRoomPage(modifier, onFunctionChange = { function = 0 })
+        ModifyRoomPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 6,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ReportPage(modifier, onFunctionChange = { function = 0 })
+        ReportPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 7,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        SettingsPage(modifier, onFunctionChange = { function = 0 })
+        SettingsPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 8,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        NotificationPage(modifier, onFunctionChange = { function = 0 })
+        NotificationPage(modifier, onFunctionChange = { function = it })
     }
 }
 
