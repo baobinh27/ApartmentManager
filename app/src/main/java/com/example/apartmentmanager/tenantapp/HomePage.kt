@@ -1,6 +1,8 @@
 package com.example.apartmentmanager.tenantapp
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -11,19 +13,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +39,6 @@ import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoCard
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
-import com.example.apartmentmanager.ui.theme.Red
 
 
 //Function 0: Trang chủ
@@ -43,17 +49,32 @@ fun HomePage(
     onLogOut: () -> Unit,
     onFunctionChange: (Int) -> Unit
 ) {
+    val scrollState = rememberScrollState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
+    val isNightMode = isSystemInDarkTheme()
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        item {
-            HeaderPane(modifier, onFunctionChange)
-        }
+        // Ảnh nền phía sau, chiếm toàn bộ màn hình
+        Image(
+            painter = painterResource(if (isNightMode) R.drawable.room_background else R.drawable.room_background_4),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black.copy(alpha = 0.2f)
+        ) {}
 
-        item {
+        // Phần nội dung chính
+        Column(
+            modifier = modifier
+                .fillMaxSize().verticalScroll(state = scrollState)
+        ) {
+            Spacer(modifier = modifier.height(screenWidth * 0.05f))
+            HeaderPane(modifier, onFunctionChange)
+
             FlowRow(
                 modifier = Modifier.padding(top = screenWidth * 0.05f)
             ) {
@@ -62,20 +83,15 @@ fun HomePage(
                 RoomInfoCard(onFunctionChange)
                 RentStatusCard(onFunctionChange)
                 FinancialReportCard(onFunctionChange)
-                ModifyInfoCard(onFunctionChange)
                 SendReportCard(onFunctionChange)
             }
 
-        }
-
-        item {
             SettingBar(onFunctionChange)
             LogOutBar(onLogOut)
-        }
-        item {
             Spacer(modifier = modifier.height(20.dp))
         }
     }
+
 }
 
 //25% màn hình bên trên của menu để hiện các thông tin chính
@@ -89,11 +105,11 @@ fun HeaderPane(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(screenHeight * 0.25f)
-            .background(color = MaterialTheme.colorScheme.primary),
+            .height(screenHeight * 0.25f).clip(ShapeDefaults.ExtraLarge)
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
     ) {
         IconButton(
-            onClick = { onFunctionChange(8) },
+            onClick = { onFunctionChange(7) },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(12.dp)
@@ -136,7 +152,6 @@ fun HeaderPane(
 }
 
 
-
 //Các thẻ chức năng
 @Composable
 fun ApartmentInfoCard(onFunctionChange: (Int) -> Unit) {
@@ -146,7 +161,7 @@ fun ApartmentInfoCard(onFunctionChange: (Int) -> Unit) {
         tint = Color.Unspecified,
         scale = 1f,
         title = "Apartment Information",
-        onClick = {onFunctionChange(1)}
+        onClick = { onFunctionChange(1) }
     )
 }
 
@@ -158,7 +173,7 @@ fun RoomInfoCard(onFunctionChange: (Int) -> Unit) {
         tint = Color.Unspecified,
         scale = 1f,
         title = "Room Information",
-        onClick = {onFunctionChange(2)}
+        onClick = { onFunctionChange(2) }
     )
 }
 
@@ -172,7 +187,7 @@ fun RentStatusCard(onFunctionChange: (Int) -> Unit) {
         tint = Color.Unspecified,
         scale = 1f,
         title = "Rent Status",
-        onClick = {onFunctionChange(3)}
+        onClick = { onFunctionChange(3) }
     )
 }
 
@@ -184,21 +199,21 @@ fun FinancialReportCard(onFunctionChange: (Int) -> Unit) {
         tint = Color.Unspecified,
         scale = 1f,
         title = "Financial Report",
-        onClick = {onFunctionChange(4)}
+        onClick = { onFunctionChange(4) }
     )
 }
 
-@Composable
-fun ModifyInfoCard(onFunctionChange: (Int) -> Unit) {
-    InfoCard(
-        icon = null,
-        painter = painterResource(R.drawable.modify),
-        tint = Color.Unspecified,
-        scale = 1f,
-        title = "Modify Room Information",
-        onClick = {onFunctionChange(5)}
-    )
-}
+//@Composable
+//fun ModifyInfoCard(onFunctionChange: (Int) -> Unit) {
+//    InfoCard(
+//        icon = null,
+//        painter = painterResource(R.drawable.modify),
+//        tint = Color.Unspecified,
+//        scale = 1f,
+//        title = "Modify Room Information",
+//        onClick = {onFunctionChange(5)}
+//    )
+//}
 
 @Composable
 fun SendReportCard(onFunctionChange: (Int) -> Unit) {
@@ -208,7 +223,7 @@ fun SendReportCard(onFunctionChange: (Int) -> Unit) {
         tint = Color.Unspecified,
         scale = 1f,
         title = "Send Report",
-        onClick = {onFunctionChange(6)}
+        onClick = { onFunctionChange(5) }
     )
 }
 
@@ -221,7 +236,7 @@ fun SettingBar(
         tint1 = MaterialTheme.colorScheme.onSecondary,
         title = "Settings",
         size1 = 0.07f,
-        onClick = {onFunctionChange(7)}
+        onClick = { onFunctionChange(6) }
     )
 }
 
@@ -230,12 +245,13 @@ fun LogOutBar(
     onLogOut: () -> Unit
 ) {
     InfoCardBar(
-        icon1 = Icons.TwoTone.ExitToApp,
-        tint1 = Red,
+        icon1 = Icons.AutoMirrored.Default.ExitToApp,
+        tint1 = MaterialTheme.colorScheme.onPrimary,
         size1 = 0.07f,
-        textColor = Color.Red,
+        textColor = MaterialTheme.colorScheme.onPrimary,
         title = "Log out",
-        onClick = onLogOut
+        onClick = onLogOut,
+        cardColor = MaterialTheme.colorScheme.inversePrimary
     )
 }
 

@@ -1,5 +1,6 @@
 package com.example.apartmentmanager.tenantapp
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -99,7 +100,6 @@ fun RoomInfoPage(
     InfoPage(
         title = "Room Information",
         onBackClick = { onFunctionChange(0) },
-        modifier = modifier
     ) {
         if (!doneLoading) {
             if (!failed) {
@@ -118,7 +118,8 @@ fun RoomInfoPage(
                 onClick = {}, //TODO
                 size1 = 0.08f,
                 icon2 = Icons.Default.KeyboardArrowDown,
-                size2 = 0.08f
+                size2 = 0.08f,
+                tint2 = MaterialTheme.colorScheme.onSecondary
             )
         }
 
@@ -423,21 +424,20 @@ private fun AreaAndRent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun RoomInfoPagePreview() {
     ApartmentManagerTheme {
         InfoPage(
             title = "Room Information",
             onBackClick = {},
-            modifier = Modifier
         ) {
             RoomNumber("P.1215")
             AreaAndRent(area = 206, rent = 45000000)
             PowerAndWater(power = 3500, water = 40000)
             InfoCardBar(
                 painter1 = painterResource(R.drawable.people),
-                title = "See Room Members",
+                title = "See Room Members (2)",
                 onClick = {}, //TODO
                 size1 = 0.08f,
                 icon2 = Icons.Default.KeyboardArrowDown,

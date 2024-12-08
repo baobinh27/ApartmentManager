@@ -1,6 +1,8 @@
 package com.example.apartmentmanager.managerapp
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.twotone.*
@@ -16,16 +20,20 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoCard
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
@@ -40,23 +48,34 @@ fun HomePage(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+    val isNightMode = isSystemInDarkTheme()
+    val scrollState = rememberScrollState()
+    Box(
+        modifier = modifier.fillMaxSize(),
     ) {
-        item {
+        // Ảnh nền phía sau, chiếm toàn bộ màn hình
+        Image(
+            painter = painterResource(if (isNightMode) R.drawable.room_background else R.drawable.room_background_3),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black.copy(alpha = 0.2f)
+        ) {}
+        Column(
+            modifier = modifier
+                .fillMaxSize().verticalScroll(state = scrollState)
+        ) {
             HeaderPane(modifier, screenHeight, onLogOut)
-        }
 
-        item {
             FlowRow(
                 modifier = Modifier.padding(top = screenWidth * 0.05f)
             ) {
                 //Các thẻ chức năng xuất hiện trong menu
                 ApartmentInfoCard(onFunctionChange)
             }
-
         }
     }
 }

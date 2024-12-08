@@ -28,6 +28,7 @@ fun InfoCardBar(
     tint1: Color = Color.Unspecified,
     size1: Float = 0.2f,
     textColor: Color = MaterialTheme.colorScheme.onSecondary,
+    cardColor: Color = MaterialTheme.colorScheme.secondary,
     title: String,
     icon2: ImageVector? = null,
     painter2: Painter? = null,
@@ -45,7 +46,7 @@ fun InfoCardBar(
             .padding(top = cardPadding, start = cardPadding, end = cardPadding)
             .width(screenWidth * 0.9f),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondary
+            containerColor = cardColor.copy(alpha = 0.9f)
         ),
         onClick = onClick
     ) {

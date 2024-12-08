@@ -68,29 +68,29 @@ fun TenantApp(
     ) {
         FinancialReportPage(modifier, onFunctionChange = { function = it })
     }
+//    AnimatedVisibility(
+//        visible = function == 5,
+//        enter = enterFromRight,
+//        exit = exitToRight
+//    ) {
+//        ModifyRoomPage(modifier, onFunctionChange = { function = it })
+//    }
     AnimatedVisibility(
         visible = function == 5,
-        enter = enterFromRight,
-        exit = exitToRight
-    ) {
-        ModifyRoomPage(modifier, onFunctionChange = { function = it })
-    }
-    AnimatedVisibility(
-        visible = function == 6,
         enter = enterFromRight,
         exit = exitToRight
     ) {
         ReportPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
-        visible = function == 7,
+        visible = function == 6,
         enter = enterFromRight,
         exit = exitToRight
     ) {
         SettingsPage(modifier, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
-        visible = function == 8,
+        visible = function == 7,
         enter = enterFromRight,
         exit = exitToRight
     ) {

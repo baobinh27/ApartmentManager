@@ -44,7 +44,6 @@ fun RentStatusPage(
     InfoPage(
         title = "Rent Status",
         onBackClick = { onFunctionChange(0) },
-        modifier = modifier
     ) {
         RoomNumber("P.1215")
         RentPeriod("10/2024")
@@ -152,7 +151,12 @@ private fun RentPeriod(
 
 @Composable
 private fun RentInfo(
-    total: String = "5,000,000đ"
+    ElecComsumption: Int = 0,
+    waterComsumption: Int = 0,
+    InternetFee: Int = 0,
+    Service: Int = 0,
+    total: String = "5,000,000đ",
+    rentStatus: List<Int> = listOf(0, 0, 0, 0)
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     var showDetails by rememberSaveable { mutableStateOf(false) }
@@ -256,7 +260,7 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "80,000đ",
+                            text = "${waterComsumption},000đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -284,7 +288,7 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "350,000đ",
+                            text = "${ElecComsumption},000đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -306,7 +310,7 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "70,000đ",
+                            text = "${Service + InternetFee},000đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -434,7 +438,7 @@ private fun ReportButton(
             Color.Unspecified,
             Color.Unspecified
         ),
-        onClick = { onFunctionChange(6) }
+        onClick = { onFunctionChange(5) }
     ) {
         Row(
             modifier = Modifier.padding(screenWidth * 0.05f),

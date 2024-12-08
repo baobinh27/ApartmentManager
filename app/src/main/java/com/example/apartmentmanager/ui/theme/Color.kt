@@ -18,6 +18,7 @@ val Navy = Color(0xFF000066)
 //val Blue = Color(0xFF000099)
 
 val DarkCyan = Color(0xFF0044AA)    //primary
+val Orange = Color(0xFFAA4400)       //onPrimary
 val BrightBlue = Color(0xFFCDDEFF)  //onPrimary
 
 val NeonBlue = Color(0xFF0099FF)    //secondary

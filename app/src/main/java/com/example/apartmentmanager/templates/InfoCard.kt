@@ -48,7 +48,8 @@ fun InfoCard(
             .width(screenWidth * 0.4f)
             .height(screenWidth * 0.4f),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondary
+            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ),
         onClick = onClick,
     ) {

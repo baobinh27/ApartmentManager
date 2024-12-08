@@ -46,7 +46,6 @@ fun ItemList(
             MaterialTheme.colorScheme.onTertiary
         ),
         shape = RectangleShape,
-        //onClick = onClick,
         content = content
     )
 }
