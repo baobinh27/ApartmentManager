@@ -40,61 +40,53 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apartmentmanager.R
+import com.example.apartmentmanager.getRoomDetail
+import com.example.apartmentmanager.getRoomFromTenant
 import com.example.apartmentmanager.templates.FailedLoadingScreen
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.LoadingScreen
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
 
 //Function 2: Thông tin phòng
 @Composable
 fun RoomInfoPage(
-    modifier: Modifier,
+    tenantID: String,
+    modifier: Modifier = Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val db = FirebaseFirestore.getInstance()
-    val apartmentRef = db.collection("Room").document("P101")
 
-    var rent by remember { mutableIntStateOf(0) }
-    var area by remember { mutableIntStateOf(0) }
-    var status by remember { mutableIntStateOf(0) }
     var roomID by remember { mutableStateOf("") }
-    var water by remember { mutableIntStateOf(0) }
-    var electricity by remember { mutableIntStateOf(0) }
-
+    var roomDetails by remember { mutableStateOf(listOf<Any>()) }
+    // (roomID, roomCost, roomSize, roomStatus, powerUnit, waterUnit)
     var failed by remember { mutableStateOf(false) }
     var doneLoading by remember { mutableStateOf(false) }
 
-    var roomInfoLoaded by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
-        apartmentRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    Log.d("Firestore", "Document data: ${document.data}")
-                    rent = document.getLong("roomCost")?.toInt() ?: 0
-                    area = document.getLong("roomSize")?.toInt() ?: 0
-                    status = document.getLong("status")?.toInt() ?: 0
-                    roomID = document.id
-                } else {
-                    failed = true
-                    Log.d("Firestore", "No such document")
-                }
-                roomInfoLoaded = true
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firestore", "get failed with ", exception)
-                failed = true
-                roomInfoLoaded = true
-            }
+        roomID = getRoomFromTenant(tenantID)
+        if (roomID.isNotEmpty()) {
+            roomDetails = getRoomDetail(roomID)
+        }
+        if (roomID.isNotEmpty() && roomDetails.isNotEmpty()) {
+            doneLoading = true
+        }
     }
 
-    LaunchedEffect(roomInfoLoaded) {
-        doneLoading = roomInfoLoaded && !failed
+    // Hiện màn hình loading thất bại nếu chờ quá 10 giây
+    LaunchedEffect(Unit) {
+        delay(10000)
+        failed = true
+        doneLoading = false
+    }
+
+    LaunchedEffect(Unit) {
+        doneLoading = roomID.isNotEmpty() && roomDetails.isNotEmpty()
     }
 
     InfoPage(
@@ -109,12 +101,12 @@ fun RoomInfoPage(
             }
         } else {
             RoomNumber(roomID)
-            AreaAndRent(area = area, rent = rent)
-            PowerAndWater(power = 3500, water = 40000)
+            AreaAndRent(area = roomDetails[1].toString().toInt(), rent = roomDetails[0].toString().toInt())
+            PowerAndWater(power = roomDetails[3].toString().toInt(), water = roomDetails[4].toString().toInt())
 
             InfoCardBar(
                 painter1 = painterResource(R.drawable.people),
-                title = "See Room Members",
+                title = "See Room Members (${roomDetails[2]})",
                 onClick = {}, //TODO
                 size1 = 0.08f,
                 icon2 = Icons.Default.KeyboardArrowDown,

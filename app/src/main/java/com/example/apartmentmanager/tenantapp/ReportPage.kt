@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
-//Function 6: Gửi báo cáo
+//Function 5: Gửi báo cáo
 @Composable
 fun ReportPage(
     modifier: Modifier,

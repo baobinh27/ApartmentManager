@@ -18,7 +18,6 @@ fun ManagerApp(
     modifier: Modifier = Modifier,
     onLogOut: () -> Unit
 ) {
-    //Chức năng mặc định = 0 (HomePage / Menu)
     var function by rememberSaveable { mutableIntStateOf(0) }
 
     //Các hiệu ứng chuyển động
@@ -33,14 +32,56 @@ fun ManagerApp(
         enter = enterFromLeft,
         exit = exitToLeft
     ) {
-        HomePage(modifier, onLogOut, onFunctionChange = { function = it })
+        HomePage(modifier, onLogOut, onFunctionChange = { function = it }, lastFunction = -1)
     }
     AnimatedVisibility(
         visible = function == 1,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ApartmentInfoPage(modifier, onFunctionChange = { function = 0 })
+        ApartmentInfoPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 2,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        RoomsInfoPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 3,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        SearchTenantPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 4,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        //SearchTenantPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 5,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        //SearchTenantPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 6,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        AccountManagementPage(modifier, onFunctionChange = { function = it })
+    }
+    AnimatedVisibility(
+        visible = function == 7,
+        enter = enterFromRight,
+        exit = exitToRight
+    ) {
+        SettingsPage(modifier, onFunctionChange = { function = it })
     }
 }
 

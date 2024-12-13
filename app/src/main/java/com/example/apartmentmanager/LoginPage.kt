@@ -6,6 +6,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
@@ -60,7 +62,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun LoginPage(
     modifier: Modifier = Modifier,
-    onLoginClick: (Int, String) -> Unit
+    onLoginClick: (Int, String) -> Unit,
+    onForgotPassword: () -> Unit,
+    onManualClick: () -> Unit
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -122,69 +126,71 @@ fun LoginPage(
                 Spacer(modifier = Modifier.height(screenWidth * 0.05f))
 
                 // Các nút đăng nhập và đăng ký
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Nút đăng ký
-                    OutlinedButton(
-                        onClick = { },
-                        modifier = Modifier.width(screenWidth * 0.25f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text(
-                            text = "Sign up",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                Button(
+                    onClick = {
+                        loading = true
+                        isValid(username, password) { role, userID ->
+                            loading = false
+                            when (role) {
+                                0 -> {
+                                    showErrorDialog = true
+                                }
 
-                    // Nút đăng nhập
-                    Button(
-                        onClick = {
-                            loading = true
-                            isValid(username, password) { role, userID ->
-                                loading = false
-                                when (role) {
-                                    0 -> {
-                                        showErrorDialog = true
-                                    }
-
-                                    else -> {
-                                        onLoginClick(role, userID)
-                                    }
+                                else -> {
+                                    onLoginClick(role, userID)
                                 }
                             }
-                        },
-                        modifier = Modifier.width(screenWidth * 0.3f),
-                        // Chỉ nhấn được khi đã nhập cả username và password
-                        enabled = filled
-                    ) {
-                        if (loading) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        } else {
-                            Text(
-                                text = "Sign In",
-                                style = MaterialTheme.typography.titleMedium
-                            )
                         }
+                    },
+                    //modifier = Modifier.width(screenWidth * 0.3f),
+                    modifier = Modifier.fillMaxWidth(),
+                    // Chỉ nhấn được khi đã nhập cả username và password
+                    enabled = filled
+                ) {
+                    if (loading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Sign In",
+                            style = MaterialTheme.typography.titleLarge
+                        )
                     }
                 }
 
                 //Quên mật khẩu
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
                 Text(
                     text = "Forgot password?",
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier.clickable { onForgotPassword() },
+                    textDecoration = TextDecoration.Underline,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = FontFamily.SansSerif,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
+                Spacer(modifier = Modifier.height(screenWidth * 0.05f))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Spacer(modifier = Modifier.width(screenWidth * 0.1f))
+                    Text(
+                        text = "New here?",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(modifier = Modifier.width(screenWidth * 0.1f))
+                    OutlinedButton(
+                        onClick = onManualClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
+                        shape = ShapeDefaults.ExtraLarge,
+                    ) {
+                        Text("Getting Started")
+                    }
+                }
             }
         }
         //Thông báo nhập sai tên đăng nhập hoặc mật khẩu
@@ -273,7 +279,9 @@ private fun UsernameBar(
             IconButton(
                 enabled = username.isNotEmpty(),
                 onClick = onClear,
-                modifier = modifier.align(Alignment.CenterEnd).padding(end = screenWidth * 0.02f)
+                modifier = modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = screenWidth * 0.02f)
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
@@ -357,7 +365,6 @@ private fun PasswordBar(
         Spacer(modifier = Modifier.width(screenWidth * 0.04f))
         // Nút hiển thị mật khẩu
 
-
     }
 
 }
@@ -404,7 +411,7 @@ fun isValid(username: String, password: String, onResult: (Int, String) -> Unit)
 @Composable
 fun LoginPreviewLightMode() {
     ApartmentManagerTheme {
-        LoginPage(onLoginClick = { _, _ -> })
+        LoginPage(onLoginClick = { _, _ -> }, onForgotPassword = {}, onManualClick = {})
     }
 }
 
@@ -412,6 +419,6 @@ fun LoginPreviewLightMode() {
 @Composable
 fun LoginPreviewDarkMode() {
     ApartmentManagerTheme {
-        LoginPage(onLoginClick = { _, _ -> })
+        LoginPage(onLoginClick = { _, _ -> }, onForgotPassword = {}, onManualClick = {})
     }
 }

@@ -16,11 +16,13 @@ import com.example.apartmentmanager.tenantapp.*
 //Giống hàm MainNavigation, hàm này quyết định xem chức năng nào sẽ được hiển thị
 @Composable
 fun TenantApp(
+    tenantID: String,
     modifier: Modifier = Modifier,
     onLogOut: () -> Unit
 ) {
     //Chức năng mặc định = 0 (HomePage / Menu)
     var function by rememberSaveable { mutableIntStateOf(0) }
+    var lastFunction by rememberSaveable { mutableIntStateOf(-1) }
 
     //Các hiệu ứng chuyển động
     val enterFromRight = slideInHorizontally(initialOffsetX = { it })
@@ -33,9 +35,12 @@ fun TenantApp(
     AnimatedVisibility(
         visible = function == 0,
         enter = enterFromLeft,
-        exit = exitToLeft
+        exit = if (lastFunction == -1) exitToRight else exitToLeft
     ) {
-        HomePage(modifier, onLogOut, onFunctionChange = { function = it })
+        HomePage(modifier, onLogOut, lastFunction, onFunctionChange = { f, lastF ->
+            lastFunction = function
+            function = f
+        })
     }
     //onFunctionChange để giúp điều hướng
     //ở HomePage, truyền vào onFunctionChange để gắn cho từng thẻ điều hướng chức năng
@@ -52,12 +57,12 @@ fun TenantApp(
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        RoomInfoPage(modifier, onFunctionChange = { function = it })
+        RoomInfoPage(tenantID = tenantID, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 3,
         enter = enterFromRight,
-        exit = exitToRight
+        exit = if (function == 0) exitToRight else exitToLeft
     ) {
         RentStatusPage(modifier, onFunctionChange = { function = it })
     }
@@ -68,13 +73,6 @@ fun TenantApp(
     ) {
         FinancialReportPage(modifier, onFunctionChange = { function = it })
     }
-//    AnimatedVisibility(
-//        visible = function == 5,
-//        enter = enterFromRight,
-//        exit = exitToRight
-//    ) {
-//        ModifyRoomPage(modifier, onFunctionChange = { function = it })
-//    }
     AnimatedVisibility(
         visible = function == 5,
         enter = enterFromRight,
@@ -103,7 +101,7 @@ fun TenantApp(
 @Composable
 fun TenantAppPreviewLightMode() {
     ApartmentManagerTheme {
-        TenantApp(modifier = Modifier, onLogOut = {})
+        TenantApp(modifier = Modifier, onLogOut = {}, tenantID = "T00001")
     }
 }
 
@@ -111,6 +109,6 @@ fun TenantAppPreviewLightMode() {
 @Composable
 fun TenantAppPreviewDarkMode() {
     ApartmentManagerTheme {
-        TenantApp(modifier = Modifier, onLogOut = {})
+        TenantApp(modifier = Modifier, onLogOut = {}, tenantID = "T00001")
     }
 }

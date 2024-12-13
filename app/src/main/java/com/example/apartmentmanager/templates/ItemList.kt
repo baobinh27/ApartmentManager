@@ -40,7 +40,7 @@ fun ItemList(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardColors(
-            MaterialTheme.colorScheme.tertiary,
+            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
             MaterialTheme.colorScheme.onTertiary,
             MaterialTheme.colorScheme.onTertiary,
             MaterialTheme.colorScheme.onTertiary

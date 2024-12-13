@@ -62,7 +62,7 @@ fun ExpandBar(
             )
             .fillMaxWidth(),
         colors = CardColors(
-            cardColor,
+            cardColor.copy(alpha = 0.9f),
             Color.Unspecified,
             Color.Unspecified,
             Color.Unspecified

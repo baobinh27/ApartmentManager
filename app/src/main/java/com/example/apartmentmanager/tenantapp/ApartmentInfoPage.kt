@@ -52,7 +52,6 @@ fun ApartmentInfoPage(
     onFunctionChange: (Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val db = FirebaseFirestore.getInstance()
     val apartmentRef = db.collection("apartmentInfo").document("general")
     val roomRef = db.collection("Room")

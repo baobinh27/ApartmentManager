@@ -1,5 +1,6 @@
 package com.example.apartmentmanager
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,29 +40,49 @@ fun MainNavigation(
     //role cho biết đối tượng nào đang đăng nhập (chủ nhà, quản lý, cư dân)
     var role by rememberSaveable { mutableIntStateOf(0) }
     var userID by rememberSaveable { mutableStateOf("") }
-    Surface (
+    Surface(
         modifier = modifier
     ) {
+        AnimatedVisibility(
+            visible = role == -2,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            GettingStarted(onBackClick = {role = 0})
+        }
+        AnimatedVisibility(
+            visible = role == -1,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            ForgotPassword(onBackClick = {role = 0})
+        }
         AnimatedVisibility(
             visible = role == 0, //Nếu role = 0 thì hiển thị trang đăng nhập
             enter = slideInHorizontally(initialOffsetX = { -it }),
             exit = slideOutHorizontally(targetOffsetX = { -it })
         ) {
-            LoginPage(onLoginClick = { r, id ->
-                role = r
-                userID = id
-            })
+            LoginPage(
+                onLoginClick = { r, id ->
+                    role = r
+                    userID = id
+                },
+                onForgotPassword = { role = -1 },
+                onManualClick = { role = -2 }
+            )
         }
         AnimatedVisibility(
             visible = role == 1, //Nếu role = 1 thì hiển thị giao diện của cư dân
             enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })) {
-            TenantApp(onLogOut = { role = 0 })
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            TenantApp(tenantID = userID, onLogOut = { role = 0 })
         }
         AnimatedVisibility(
             visible = role == 2, //Nếu role = 2 thì hiển thị giao diện của quản lý
             enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })) {
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
             ManagerApp(onLogOut = { role = 0 })
         }
     }

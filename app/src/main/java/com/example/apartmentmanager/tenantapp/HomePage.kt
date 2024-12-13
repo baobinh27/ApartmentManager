@@ -1,12 +1,21 @@
 package com.example.apartmentmanager.tenantapp
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,28 +26,41 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.twotone.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoCard
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
+import kotlinx.coroutines.delay
 
 
 //Function 0: Trang chủ
@@ -47,11 +69,18 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 fun HomePage(
     modifier: Modifier,
     onLogOut: () -> Unit,
-    onFunctionChange: (Int) -> Unit
+    lastFunction: Int,
+    onFunctionChange: (Int, Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val isNightMode = isSystemInDarkTheme()
+    val enterFromTop = slideInVertically(initialOffsetY = { it })
+    val exitToTop = slideOutVertically(targetOffsetY = { -it })
+
+    var showLoginStatus by rememberSaveable { mutableStateOf(true) }
+    var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -69,8 +98,7 @@ fun HomePage(
 
         // Phần nội dung chính
         Column(
-            modifier = modifier
-                .fillMaxSize().verticalScroll(state = scrollState)
+            modifier = modifier.fillMaxSize().verticalScroll(state = scrollState)
         ) {
             Spacer(modifier = modifier.height(screenWidth * 0.05f))
             HeaderPane(modifier, onFunctionChange)
@@ -87,29 +115,146 @@ fun HomePage(
             }
 
             SettingBar(onFunctionChange)
-            LogOutBar(onLogOut)
+            LogOutBar(onClick = {showLogoutDialog = true})
             Spacer(modifier = modifier.height(20.dp))
         }
-    }
 
+        LaunchedEffect(showLoginStatus) {
+            if (showLoginStatus) {
+                delay(2000)
+                showLoginStatus = false
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showLoginStatus && (lastFunction == -1),
+            modifier = Modifier.align(Alignment.TopCenter),
+            enter = enterFromTop,
+            exit = exitToTop
+        ) {
+            LoginDialog(onClick = { showLoginStatus = false })
+        }
+
+        AnimatedVisibility(
+            visible = showLogoutDialog,
+            modifier = Modifier.align(Alignment.TopCenter),
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            LogoutDialog(onLogOut, onDismiss = {showLogoutDialog = false})
+        }
+    }
+}
+
+@Composable
+private fun LogoutDialog(
+    onLogOut: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Text(
+                text = "Log out",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .clickable { onLogOut() }
+                    .padding(horizontal = screenWidth * 0.025f)
+            )
+        },
+        dismissButton = {
+            Text(
+                text = "Cancel",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .clickable { onDismiss() }
+                    .padding(horizontal = screenWidth * 0.025f)
+            )
+        },
+        title = {
+            Text(
+                text = "Confirm Log Out",
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Spacer(modifier = Modifier.height(screenWidth * 0.1f))
+            Text(
+                text = "Are you sure you want to log out?",
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+    )
+}
+
+@Composable
+private fun LoginDialog(onClick: () -> Unit) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = screenWidth * 0.05f),
+        shape = ShapeDefaults.Large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(screenWidth * 0.05f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.info),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(screenWidth * 0.1f)
+                    .scale(1.2f),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+            Text(
+                text = "Logged in as Tenant",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSecondary
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = onClick,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.scale(1.5f)
+                )
+            }
+
+        }
+
+    }
 }
 
 //25% màn hình bên trên của menu để hiện các thông tin chính
 @Composable
 fun HeaderPane(
     modifier: Modifier,
-    onFunctionChange: (Int) -> Unit
+    onFunctionChange: (Int, Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(screenHeight * 0.25f).clip(ShapeDefaults.ExtraLarge)
+            .height(screenHeight * 0.25f)
+            .clip(ShapeDefaults.ExtraLarge)
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
     ) {
         IconButton(
-            onClick = { onFunctionChange(7) },
+            onClick = { onFunctionChange(7, 0) },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(12.dp)
@@ -154,52 +299,50 @@ fun HeaderPane(
 
 //Các thẻ chức năng
 @Composable
-fun ApartmentInfoCard(onFunctionChange: (Int) -> Unit) {
+fun ApartmentInfoCard(onFunctionChange: (Int, Int) -> Unit) {
     InfoCard(
         icon = null,
         painter = painterResource(R.drawable.apartment),
         tint = Color.Unspecified,
         scale = 1f,
         title = "Apartment Information",
-        onClick = { onFunctionChange(1) }
+        onClick = { onFunctionChange(1, 0) }
     )
 }
 
 @Composable
-fun RoomInfoCard(onFunctionChange: (Int) -> Unit) {
+fun RoomInfoCard(onFunctionChange: (Int, Int) -> Unit) {
     InfoCard(
         icon = null,
         painter = painterResource(R.drawable.room),
         tint = Color.Unspecified,
         scale = 1f,
         title = "Room Information",
-        onClick = { onFunctionChange(2) }
+        onClick = { onFunctionChange(2, 0) }
     )
 }
 
 @Composable
-fun RentStatusCard(onFunctionChange: (Int) -> Unit) {
+fun RentStatusCard(onFunctionChange: (Int, Int) -> Unit) {
     InfoCard(
-        //icon = Icons.Default.Info,
         icon = null,
         painter = painterResource(R.drawable.coin),
-        //painter = null,
         tint = Color.Unspecified,
         scale = 1f,
         title = "Rent Status",
-        onClick = { onFunctionChange(3) }
+        onClick = { onFunctionChange(3, 0) }
     )
 }
 
 @Composable
-fun FinancialReportCard(onFunctionChange: (Int) -> Unit) {
+fun FinancialReportCard(onFunctionChange: (Int, Int) -> Unit) {
     InfoCard(
         icon = null,
         painter = painterResource(R.drawable.financial_report),
         tint = Color.Unspecified,
         scale = 1f,
         title = "Financial Report",
-        onClick = { onFunctionChange(4) }
+        onClick = { onFunctionChange(4, 0) }
     )
 }
 
@@ -216,33 +359,33 @@ fun FinancialReportCard(onFunctionChange: (Int) -> Unit) {
 //}
 
 @Composable
-fun SendReportCard(onFunctionChange: (Int) -> Unit) {
+fun SendReportCard(onFunctionChange: (Int, Int) -> Unit) {
     InfoCard(
         icon = null,
         painter = painterResource(R.drawable.warning),
         tint = Color.Unspecified,
         scale = 1f,
         title = "Send Report",
-        onClick = { onFunctionChange(5) }
+        onClick = { onFunctionChange(5, 0) }
     )
 }
 
 @Composable
 fun SettingBar(
-    onFunctionChange: (Int) -> Unit
+    onFunctionChange: (Int, Int) -> Unit
 ) {
     InfoCardBar(
         icon1 = Icons.TwoTone.Settings,
         tint1 = MaterialTheme.colorScheme.onSecondary,
         title = "Settings",
         size1 = 0.07f,
-        onClick = { onFunctionChange(6) }
+        onClick = { onFunctionChange(6, 0) }
     )
 }
 
 @Composable
 fun LogOutBar(
-    onLogOut: () -> Unit
+    onClick: () -> Unit
 ) {
     InfoCardBar(
         icon1 = Icons.AutoMirrored.Default.ExitToApp,
@@ -250,7 +393,7 @@ fun LogOutBar(
         size1 = 0.07f,
         textColor = MaterialTheme.colorScheme.onPrimary,
         title = "Log out",
-        onClick = onLogOut,
+        onClick = onClick,
         cardColor = MaterialTheme.colorScheme.inversePrimary
     )
 }
@@ -260,7 +403,11 @@ fun LogOutBar(
 @Composable
 fun HomePagePreviewLightMode() {
     ApartmentManagerTheme {
-        HomePage(modifier = Modifier, onLogOut = {}, onFunctionChange = {})
+        HomePage(
+            modifier = Modifier,
+            onLogOut = {},
+            lastFunction = -1,
+            onFunctionChange = { _, _ -> })
 
     }
 }
@@ -269,6 +416,10 @@ fun HomePagePreviewLightMode() {
 @Composable
 fun HomePagePreviewDarkMode() {
     ApartmentManagerTheme {
-        HomePage(modifier = Modifier, onLogOut = {}, onFunctionChange = {})
+        HomePage(
+            modifier = Modifier,
+            onLogOut = {},
+            lastFunction = -1,
+            onFunctionChange = { _, _ -> })
     }
 }

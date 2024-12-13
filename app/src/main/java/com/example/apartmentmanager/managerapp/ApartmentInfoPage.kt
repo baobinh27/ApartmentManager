@@ -1,16 +1,49 @@
 package com.example.apartmentmanager.managerapp
 
 import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.apartmentmanager.R
+import com.example.apartmentmanager.getApartmentInfo
+import com.example.apartmentmanager.getRoomCount
+import com.example.apartmentmanager.templates.FailedLoadingScreen
+import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
+import com.example.apartmentmanager.templates.LoadingScreen
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -20,33 +53,44 @@ fun ApartmentInfoPage(
     modifier: Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val db = FirebaseFirestore.getInstance()
-    val apartmentRef = db.collection("apartmentInfo").document("general")
 
-    // Tạo MutableState để lưu trữ dữ liệu và cập nhật khi có thay đổi
-    var apartmentName by remember { mutableStateOf("Loading...") }
-    var address by remember { mutableStateOf("Loading...") }
-    var owner by remember { mutableStateOf("Loading...") }
-    var contactInformation by remember { mutableStateOf("Loading...") }
+    var managerCount by remember { mutableIntStateOf(0) }
+    var roomCount by remember { mutableIntStateOf(0) }
+    var apartmentInfo by remember { mutableStateOf(listOf<String>()) }
+    // (apartmentName, address, area, owner, contact)
 
-    // Lấy dữ liệu từ Firestore
-    // Ở đây sử dụng LaunchedEffect để thực hiện tác vụ chỉ một lần khi Composable được khởi tạo
+
+    var failed by remember { mutableStateOf(false) }
+    var doneLoading by remember { mutableStateOf(false) }
+
+    // Biến trạng thái để theo dõi từng tác vụ Firebase
+    var apartmentInfoLoaded by remember { mutableStateOf(false) }
+    var roomsLoaded by remember { mutableStateOf(false) }
+    var authLoaded by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
-        apartmentRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    Log.d("Firestore", "Document data: ${document.data}")
-                    apartmentName = document.getString("name").orEmpty()
-                    address = document.getString("address").orEmpty()
-                    owner = document.getString("owner").orEmpty()
-                    contactInformation = document.getString("contact").orEmpty()
-                } else {
-                    Log.d("Firestore", "No such document")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firestore", "get failed with ", exception)
-            }
+        apartmentInfo = getApartmentInfo()
+        if (apartmentInfo.isNotEmpty()) {
+            apartmentInfoLoaded = true
+        } else {
+            failed = true
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        roomCount = getRoomCount()
+        if (roomCount != -1) {
+            roomsLoaded = true
+        } else {
+            failed = true
+        }
+    }
+
+    // Kiểm tra tất cả các tác vụ đã hoàn thành, sẵn sàng hiển thị hay chưa
+    LaunchedEffect(apartmentInfoLoaded, roomsLoaded, authLoaded) {
+        doneLoading = apartmentInfoLoaded && roomsLoaded && authLoaded && !failed
     }
 
     InfoPage(
@@ -54,29 +98,246 @@ fun ApartmentInfoPage(
         onBackClick = { onFunctionChange(0) },
         modifier = modifier
     ) {
-        Text("Apartment Name: Chung cư $apartmentName")
-        Text("Address: $address")
-        Text("Number of Rooms: ")
-        Text("Number of Floors: ")
-        Text("Area: ")
-        Text("Description: ")
-        Text("Owner: $owner")
-        Text("Contact Information: $contactInformation")
+        if (!doneLoading) {
+            if (failed) {
+                FailedLoadingScreen()
+            } else {
+                LoadingScreen()
+            }
+        } else {
+            NameAndAddress(name = apartmentInfo[0], address = apartmentInfo[1])
+            RoomsAndArea(numberRooms = roomCount, area = apartmentInfo[2].toInt())
+            InfoCardBar(
+                painter1 = painterResource(id = R.drawable.owner),
+                size1 = 0.08f,
+                onClick = { }, //TODO
+                title = "Owners (1)",
+                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                size2 = 0.1f,
+                tint2 = MaterialTheme.colorScheme.onSecondary
+            )
+            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            InfoCardBar(
+                painter1 = painterResource(id = R.drawable.manager),
+                size1 = 0.08f,
+                onClick = {},  //TODO
+                title = "Managers ($managerCount)",
+                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                size2 = 0.1f,
+                tint2 = MaterialTheme.colorScheme.onSecondary
+            )
+        }
+    }
+}
+
+@Composable
+private fun NameAndAddress(
+    name: String,
+    address: String,
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        modifier = Modifier
+            .padding(
+                top = screenWidth * 0.05f,
+                start = screenWidth * 0.05f,
+                end = screenWidth * 0.05f
+            )
+            .fillMaxWidth(),
+        colors = CardColors(
+            MaterialTheme.colorScheme.secondary,
+            Color.Unspecified,
+            Color.Unspecified,
+            Color.Unspecified
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(screenWidth * 0.05f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.apartment2),
+                    contentDescription = "Apartment Information",
+                    modifier = Modifier.height(screenWidth * 0.2f)
+                )
+                Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+                Text(
+                    text = "$name Apartment",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
+            Text(
+                text = "Address: $address",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+        }
+
+    }
+}
+
+@Composable
+fun RoomsAndArea(
+    numberRooms: Int,
+    area: Int
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = screenWidth * 0.05f)
+    ) {
+        Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp
+            ),
+            modifier = Modifier
+                .width(screenWidth * 0.35f),
+            colors = CardColors(
+                MaterialTheme.colorScheme.secondary,
+                Color.Unspecified,
+                Color.Unspecified,
+                Color.Unspecified
+            )
+
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(screenWidth * 0.05f)
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "$numberRooms",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+                Text(
+                    text = "Number of rooms",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
+        Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp
+            ),
+            modifier = Modifier
+                .width(screenWidth * 0.5f),
+            colors = CardColors(
+                MaterialTheme.colorScheme.secondary,
+                Color.Unspecified,
+                Color.Unspecified,
+                Color.Unspecified
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(screenWidth * 0.05f)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        append("$area ")
+                        withStyle(
+                            style = SpanStyle(
+                                fontSize = 24.sp
+                            )
+                        ) {
+                            append("m")
+                        }
+                        withStyle(
+                            style = SpanStyle(
+                                baselineShift = BaselineShift.Superscript,
+                                fontSize = 15.sp // Kích thước nhỏ hơn cho chỉ số
+                            )
+                        ) {
+                            append("2")
+                        }
+                    },
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                )
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.area),
+                        contentDescription = "area",
+                        modifier = Modifier.height(screenWidth * 0.1f),
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+                    Text(
+                        text = "Apartment\nArea",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+            }
+        }
+        Spacer(modifier = Modifier.width(screenWidth * 0.05f))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ApartmentInfoPagePreviewLightMode() {
+private fun ApartmentInfoPagePreviewLightMode() {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     ApartmentManagerTheme {
-        ApartmentInfoPage(modifier = Modifier, onFunctionChange = {})
-    }
-}
-
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ApartmentInfoPagePreviewDarkMode() {
-    ApartmentManagerTheme {
-        ApartmentInfoPage(modifier = Modifier, onFunctionChange = {})
+        InfoPage(
+            title = "Apartment Information",
+            onBackClick = { },
+            modifier = Modifier
+        ) {
+            NameAndAddress(name = "apartmentName", address = "address")
+            RoomsAndArea(numberRooms = 32, area = 9999)
+            InfoCardBar(
+                painter1 = painterResource(id = R.drawable.owner),
+                size1 = 0.08f,
+                onClick = { }, //TODO
+                title = "Owners (0)",
+                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                size2 = 0.1f,
+                tint2 = MaterialTheme.colorScheme.onSecondary
+            )
+            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            InfoCardBar(
+                painter1 = painterResource(id = R.drawable.manager),
+                size1 = 0.08f,
+                onClick = {},  //TODO
+                title = "Managers (1)",
+                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                size2 = 0.1f,
+                tint2 = MaterialTheme.colorScheme.onSecondary
+            )
+        }
     }
 }

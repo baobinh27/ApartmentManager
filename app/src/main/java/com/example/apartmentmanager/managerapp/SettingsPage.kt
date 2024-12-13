@@ -1,14 +1,8 @@
-package com.example.apartmentmanager.tenantapp
+package com.example.apartmentmanager.managerapp
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -18,17 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.twotone.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.twotone.Delete
-import androidx.compose.material.icons.twotone.Info
-import androidx.compose.material.icons.twotone.KeyboardArrowRight
-import androidx.compose.material.icons.twotone.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,12 +34,9 @@ import com.example.apartmentmanager.templates.ExpandBar
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.ItemList
-import com.example.apartmentmanager.templates.ItemListChild
 import com.example.apartmentmanager.tenantapp.secondarypage.ChangePassword
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
-
-//Function 7: Cài đặt
 @Composable
 fun SettingsPage(
     modifier: Modifier,
@@ -312,7 +300,7 @@ private fun ThemeSetting(
 @Composable
 fun SettingsPagePreviewLightMode() {
     ApartmentManagerTheme {
-        SettingsPage(modifier = Modifier, onFunctionChange = {})
+        com.example.apartmentmanager.tenantapp.SettingsPage(modifier = Modifier, onFunctionChange = {})
     }
 }
 
@@ -320,6 +308,6 @@ fun SettingsPagePreviewLightMode() {
 @Composable
 fun SettingsPagePreviewDarkMode() {
     ApartmentManagerTheme {
-        SettingsPage(modifier = Modifier, onFunctionChange = {})
+        com.example.apartmentmanager.tenantapp.SettingsPage(modifier = Modifier, onFunctionChange = {})
     }
 }
