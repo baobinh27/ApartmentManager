@@ -107,3 +107,4 @@ suspend fun getApartmentInfo(): List<String> {
     }
     return listOf(apartmentName, address, area.toString(), owner, contact)
 }
+// 10 diem
