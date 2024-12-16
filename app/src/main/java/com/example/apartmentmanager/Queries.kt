@@ -291,3 +291,123 @@ fun changepassword(username: String,newpass: String)
         }
 
 }
+
+
+
+fun createBillRecord(
+    roomID: String,
+    tmonth: String,
+    year: String,
+    elecConsumption: Int,
+    waterConsumption: Int
+) {
+    val month = "T$tmonth" // Tháng ở dạng Txx
+
+    // Tham chiếu đến document năm trong collection Bills
+    val yearRef = db.collection("Bills").document(year)
+
+    // Kiểm tra sự tồn tại của document năm (year)
+    yearRef.get()
+        .addOnSuccessListener { yearDocument ->
+            if (yearDocument.exists()) {
+                // Nếu document năm đã tồn tại, tiếp tục kiểm tra subcollection tháng
+                val monthRef = yearRef.collection(month)
+
+                // Kiểm tra sự tồn tại của subcollection tháng
+                monthRef.get()
+                    .addOnSuccessListener { monthDocuments ->
+                        if (monthDocuments.isEmpty()) {
+                            // Nếu subcollection tháng chưa có dữ liệu, tạo mới subcollection tháng
+                            Log.d("Firebase", "Month $month does not exist, creating new collection for month.")
+
+                            // Tạo document cho phòng trong subcollection tháng
+                            val roomRef = monthRef.document(roomID)
+                            roomRef.get()
+                                .addOnSuccessListener { roomDocument ->
+                                    if (!roomDocument.exists()) {
+                                        // Nếu document phòng (roomID) chưa có, tạo mới document phòng
+                                        val billData = hashMapOf(
+                                            "elecConsumption" to elecConsumption,
+                                            "waterConsumption" to waterConsumption,
+                                            "roomID" to roomID
+                                        )
+                                        roomRef.set(billData)
+                                            .addOnSuccessListener {
+                                                Log.d("Firebase", "Bill for room $roomID in $month/$year has been created successfully!")
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Log.w("Firebase", "Error creating bill for room $roomID in $month/$year: ${e.message}")
+                                            }
+                                    } else {
+                                        Log.d("Firebase", "Bill already exists for room $roomID in $month/$year.")
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w("Firebase", "Error checking room $roomID in month $month/$year: ${e.message}")
+                                }
+                        } else {
+                            // Subcollection tháng đã tồn tại, kiểm tra và thêm phòng
+                            val roomRef = monthRef.document(roomID)
+                            roomRef.get()
+                                .addOnSuccessListener { roomDocument ->
+                                    if (!roomDocument.exists()) {
+                                        // Tạo hoá đơn mới cho phòng
+                                        val billData = hashMapOf(
+                                            "elecConsumption" to elecConsumption,
+                                            "waterConsumption" to waterConsumption,
+                                            "roomID" to roomID
+                                        )
+                                        roomRef.set(billData)
+                                            .addOnSuccessListener {
+                                                Log.d("Firebase", "Bill for room $roomID in $month/$year has been created successfully!")
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Log.w("Firebase", "Error creating bill for room $roomID in $month/$year: ${e.message}")
+                                            }
+                                    } else {
+                                        Log.d("Firebase", "Bill already exists for room $roomID in $month/$year.")
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w("Firebase", "Error checking room $roomID in month $month/$year: ${e.message}")
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("Firebase", "Error checking month $month in year $year: ${e.message}")
+                    }
+            } else {
+                // Nếu document năm chưa tồn tại, tạo document năm mới và tiếp tục xử lý tháng và phòng
+                val yearData = hashMapOf("year" to year)
+                yearRef.set(yearData)
+                    .addOnSuccessListener {
+                        Log.d("Firebase", "Year document $year created successfully.")
+
+                        // Sau khi tạo document năm, kiểm tra tháng và phòng
+                        val monthRef = yearRef.collection(month)
+                        val roomRef = monthRef.document(roomID)
+                        val billData = hashMapOf(
+                            "elecConsumption" to elecConsumption,
+                            "waterConsumption" to waterConsumption,
+                            "roomID" to roomID
+                        )
+
+                        roomRef.set(billData)
+                            .addOnSuccessListener {
+                                Log.d("Firebase", "Bill for room $roomID in $month/$year has been created successfully!")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w("Firebase", "Error creating bill for room $roomID in $month/$year: ${e.message}")
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("Firebase", "Error creating year document $year: ${e.message}")
+                    }
+            }
+        }
+        .addOnFailureListener { e ->
+            Log.w("Firebase", "Error checking year document $year: ${e.message}")
+        }
+}
+
+
