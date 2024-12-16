@@ -454,27 +454,7 @@ private fun RoomBar(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val options = listOf(
-        "P101",
-        "P102",
-        "P103",
-        "P104",
-        "P105",
-        "P201",
-        "P202",
-        "P203",
-        "P204",
-        "P205",
-        "P301",
-        "P302",
-        "P303",
-        "P304",
-        "P305",
-        "P401",
-        "P402",
-        "P403",
-        "P404",
-        "P405"
+    val options = listOf("P101", "P102", "P103", "P104", "P105", "P201", "P202", "P203", "P204", "P205", "P301", "P302", "P303", "P304", "P305", "P401", "P402", "P403", "P404", "P405"
     )
     var selectedOption by rememberSaveable { mutableStateOf("") }
 
