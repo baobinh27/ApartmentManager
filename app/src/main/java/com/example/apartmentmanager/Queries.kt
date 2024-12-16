@@ -12,11 +12,13 @@ import com.google.firebase.Timestamp
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import kotlin.random.Random
 
 val db = FirebaseFirestore.getInstance()
-
+//lấy mã phòng từ mã cư dân
 suspend fun getRoomFromTenant(tenantID: String): String {
     val roomIDref = db.collection("tenants").document(tenantID)
 
@@ -34,7 +36,7 @@ suspend fun getRoomFromTenant(tenantID: String): String {
         ""
     }
 }
-
+//lấy thông tin phòng từ mã phòng
 suspend fun getRoomDetail(rID: String): List<Any> {
     val roomRef = db.collection("Room").document(rID)
     val apartmentRef = db.collection("apartmentInfo").document("general")
@@ -68,7 +70,7 @@ suspend fun getRoomDetail(rID: String): List<Any> {
     }
     return listOf(rCost, rSize, rStatus, rEprice, rWprice)
 }
-
+//đếm số phòng
 suspend fun getRoomCount(): Int {
     val collectionRef = db.collection("Room")
 
@@ -82,7 +84,7 @@ suspend fun getRoomCount(): Int {
         -1
     }
 }
-
+//lấy thông tin chung cư
 suspend fun getApartmentInfo(): List<String> {
     val apartmentRef = db.collection("apartmentInfo").document("general")
 
@@ -112,7 +114,7 @@ suspend fun getApartmentInfo(): List<String> {
 
     return listOf(apartmentName, address, area.toString(), roomAmount.toString(), owner, contact)
 }
-
+//lấy danh sách tất cả phòng
 suspend fun getRoomList(): List<String> {
     val roomsRef = db.collection("Room")
     val roomList = mutableListOf<String>()
@@ -129,7 +131,7 @@ suspend fun getRoomList(): List<String> {
 
     return roomList
 }
-
+//lấy thông tin cư dân từ mã cư dân
 suspend fun getTenantInfo(tenantID: String): List<String> {
     val tenantsRef = db.collection("tenants").document(tenantID)
 
@@ -141,14 +143,19 @@ suspend fun getTenantInfo(tenantID: String): List<String> {
     var roomID = ""
     var hometown = ""
 
+    val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
     try {
         val document = tenantsRef.get().await()
         if (document.exists()) {
             Log.d("Firestore", "Document data: ${document.data}")
 
-            dateArrive = document.getTimestamp("dateArrive")?.toDate()?.toString().orEmpty()
-            dateLeave = document.getTimestamp("dateLeave")?.toDate()?.toString().orEmpty()
-            dateOfBirth = document.getTimestamp("dateOfBirth")?.toDate()?.toString().orEmpty()
+            dateArrive = document.getTimestamp("dateArrive")?.toDate()?.toInstant()
+                ?.atZone(ZoneId.systemDefault())?.toLocalDate()?.format(dateFormatter).orEmpty()
+            dateLeave = document.getTimestamp("dateLeave")?.toDate()?.toInstant()
+                ?.atZone(ZoneId.systemDefault())?.toLocalDate()?.format(dateFormatter).orEmpty()
+            dateOfBirth = document.getTimestamp("dateOfBirth")?.toDate()?.toInstant()
+                ?.atZone(ZoneId.systemDefault())?.toLocalDate()?.format(dateFormatter).orEmpty()
 
             phone = document.getString("phone").orEmpty()
             name = document.getString("name").orEmpty()
@@ -160,7 +167,7 @@ suspend fun getTenantInfo(tenantID: String): List<String> {
     } catch (exception: Exception) {
         Log.e("Firestore", "Error fetching document", exception)
     }
-
+    if (dateLeave == "") {dateLeave = "N/A"}
     return listOf(name, dateOfBirth, phone, dateArrive, dateLeave, roomID, hometown)
 }
 
@@ -182,6 +189,98 @@ suspend fun getTenantsList(roomID: String): List<Pair<String, String>> {
     }
 
     return tenantsList
+}
+
+suspend fun findUserByName(name: String): List<String>? {
+    val db = FirebaseFirestore.getInstance()
+
+    return try {
+        val tenantsRef = db.collection("tenants")
+        val documents = tenantsRef.whereEqualTo("name", name).get().await()
+        if (documents.isEmpty) {
+            // Nếu không tìm thấy người dùng với tên này
+            null
+        } else {
+            val usersList = mutableListOf<String>()
+
+            // Duyệt qua tất cả các document trong collection "tenants"
+            for (userDoc in documents) {
+                // Tạo đối tượng User từ dữ liệu trong document
+                val gname=userDoc.getString("name") ?: ""
+                if(gname==name)
+                {
+                    val id =userDoc.id
+                    // Thêm người dùng vào danh sách
+                    usersList.add(id)
+                }
+
+            }
+            usersList
+        }
+    } catch (e: Exception) {
+        // Xử lý lỗi nếu không lấy được dữ liệu
+        println("Error getting user data: ${e.message}")
+        null
+    }
+}
+
+suspend fun getBillInfo(month: Int, year: Int): List<List<Int>> {
+    val apartmentRef = db.collection("apartmentInfo").document("general")
+    var waterunit = 0
+    var electunit = 0
+
+    val billInfoList: MutableList<MutableList<Int>> = mutableListOf()
+    val roomIdList = getRoomList();
+    var elecComsumption = 0;
+    var internet = 0;
+    var services = 0;
+    var waterComsumption = 0;
+    var roomcost = 0;
+    var totalBill = 0;
+    var waterBill = 0;
+    var electBill = 0;
+    try {
+        val document = apartmentRef.get().await()
+        if (document.exists()) {
+            Log.d("Firestore", "Document data: ${document.data}")
+            waterunit = document.getLong("waterUnit")?.toInt() ?: 0
+            electunit = document.getLong("powerUnit")?.toInt() ?: 0
+
+        } else {
+            Log.d("Firestore", "No such document")
+        }
+    } catch (exception: Exception) {
+        Log.d("Firestore", "get failed with ", exception)
+    }
+
+    try{
+        for (roomId in roomIdList) {
+            val path = "$year/T$month/${roomId}"
+            val billInfo = db.collection("Bill").document(path).get().await()
+            val roomInfo = db.collection("Room").document(roomId).get().await()
+            if(billInfo.exists() && roomInfo.exists())
+            {
+                roomcost = roomInfo.getLong("roomCost")?.toInt() ?: 0
+                elecComsumption = billInfo.getLong("ElecComsumption")?.toInt() ?: 0
+                internet = billInfo.getLong("Internet")?.toInt() ?: 0
+                services = billInfo.getLong("Service")?.toInt() ?: 0
+                waterComsumption = billInfo.getLong("WaterComsumption")?.toInt() ?: 0
+
+                waterBill = waterunit * waterComsumption
+                electBill = electunit * elecComsumption
+                totalBill = roomcost + waterBill + electBill + internet + services
+                billInfoList.add(mutableListOf(roomcost, waterComsumption, waterBill, elecComsumption, electBill, services, totalBill))
+            }
+            else
+            {
+                Log.d("Firestore", "No such document")
+            }
+        }
+
+    } catch (exception: Exception) {
+        Log.d("Firestore", "get failed with ", exception) // Trả về danh sách rỗng nếu có lỗi
+    }
+    return billInfoList;
 }
 
 fun generateRandomPassword(length: Int): String {
@@ -263,4 +362,27 @@ suspend fun addAccount(
         .update("roomStatus", roomStatus + 1)
     countRef.update("idCount", count + 1)
     return if (isValid) {passwordAdd} else {"-1"}
+}
+
+suspend fun isValidUser(username: String, password: String): Boolean {
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("authentication")
+    return try {
+        // Thực hiện truy vấn Firestore và chờ kết quả
+        val result = userRef.get().await()
+        // Kiểm tra tài liệu trong Firestore
+        for (document in result) {
+            if (document.getString("username") == username &&
+                document.getString("password") == password &&
+                document.getBoolean("isActive") == true
+            ) {
+                return true // Trả về true nếu tìm thấy tài khoản hợp lệ
+            }
+        }
+        false // Trả về false nếu không tìm thấy tài khoản hợp lệ
+    } catch (e: Exception) {
+        // Xử lý lỗi nếu có
+        e.printStackTrace()
+        false
+    }
 }
