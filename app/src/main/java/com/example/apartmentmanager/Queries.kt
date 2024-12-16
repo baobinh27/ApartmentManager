@@ -292,8 +292,6 @@ fun changepassword(username: String,newpass: String)
 
 }
 
-
-
 fun createBillRecord(
     roomID: String,
     tmonth: String,
@@ -407,6 +405,25 @@ fun createBillRecord(
         }
         .addOnFailureListener { e ->
             Log.w("Firebase", "Error checking year document $year: ${e.message}")
+        }
+}
+data class Report(
+    val reply: String,
+    val report: String,
+    val roomID: String,
+    val replydate: java.util.Date,
+    val reportdate: java.util.Date
+)
+
+suspend fun pushData(reply: String, report: String, roomID: String) {
+    val reportData = Report(reply, report, roomID, java.util.Date(), java.util.Date())
+    db.collection("report")
+        .add(reportData)
+        .addOnSuccessListener { documentReference ->
+            Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
+        }
+        .addOnFailureListener { e ->
+            Log.w("Firestore", "Error adding document", e)
         }
 }
 
