@@ -401,7 +401,7 @@ private fun PaymentButton() {
             )
             Spacer(modifier = Modifier.width(screenWidth * 0.025f))
             Text(
-                text = "Pay now",
+                text = "How to pay",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )

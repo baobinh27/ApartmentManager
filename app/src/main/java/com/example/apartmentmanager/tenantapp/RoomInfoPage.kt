@@ -79,10 +79,9 @@ fun RoomInfoPage(
     }
 
     // Hiện màn hình loading thất bại nếu chờ quá 10 giây
-    LaunchedEffect(Unit) {
+    LaunchedEffect(doneLoading) {
         delay(10000)
-        failed = true
-        doneLoading = false
+        if (!doneLoading) failed = true
     }
 
     LaunchedEffect(Unit) {

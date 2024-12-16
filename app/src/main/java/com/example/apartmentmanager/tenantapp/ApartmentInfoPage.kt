@@ -38,12 +38,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apartmentmanager.R
+import com.example.apartmentmanager.getApartmentInfo
 import com.example.apartmentmanager.templates.FailedLoadingScreen
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.LoadingScreen
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 
 //Function 1: Thông tin chung cư
 @Composable
@@ -52,83 +54,31 @@ fun ApartmentInfoPage(
     onFunctionChange: (Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val db = FirebaseFirestore.getInstance()
-    val apartmentRef = db.collection("apartmentInfo").document("general")
-    val roomRef = db.collection("Room")
-    val authRef = db.collection("authentication")
 
-    // Tạo MutableState để lưu trữ dữ liệu và cập nhật khi có thay đổi
-    var apartmentName by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-    var owner by remember { mutableStateOf("") }
-    var contactInformation by remember { mutableStateOf("") }
-    var numberRooms by remember { mutableIntStateOf(0) }
-    var area by remember { mutableIntStateOf(0) }
-    var ownerCount by remember { mutableIntStateOf(0) }
     var managerCount by remember { mutableIntStateOf(0) }
 
     var failed by remember { mutableStateOf(false) }
     var doneLoading by remember { mutableStateOf(false) }
 
-    // Biến trạng thái để theo dõi từng tác vụ Firebase
-    var apartmentInfoLoaded by remember { mutableStateOf(false) }
-    var roomsLoaded by remember { mutableStateOf(false) }
-    var authLoaded by remember { mutableStateOf(false) }
-    // Lấy dữ liệu từ Firestore
-    // Ở đây sử dụng LaunchedEffect để thực hiện tác vụ chỉ một lần khi Composable được khởi tạo
-    LaunchedEffect(Unit) {
-        apartmentRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    Log.d("Firestore", "Document data: ${document.data}")
-                    apartmentName = document.getString("name").orEmpty()
-                    address = document.getString("address").orEmpty()
-                    owner = document.getString("owner").orEmpty()
-                    contactInformation = document.getString("contact").orEmpty()
-                    area = document.getLong("area")?.toInt() ?: 0
-                } else {
-                    Log.d("Firestore", "No such document")
-                    failed = true
-                }
-                apartmentInfoLoaded = true
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firestore", "get failed with ", exception)
-                failed = true
-                apartmentInfoLoaded = true
-            }
-        roomRef.get()
-            .addOnSuccessListener { documents ->
-                numberRooms = documents.size()
-                roomsLoaded = true
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firestore", "get failed with ", exception)
-                failed = true
-                roomsLoaded = true
-            }
-        authRef.get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val id = document.id
-                    if (id[0] == 'O') {
-                        ownerCount++
-                    } else if (id[0] == 'M') {
-                        managerCount++
-                    }
-                }
-                authLoaded = true
-            }
-            .addOnFailureListener { exception ->
-                Log.d("Firestore", "get failed with ", exception)
-                failed = true
-                authLoaded = true
-            }
+    var apartmentInfo by remember { mutableStateOf(listOf<String>("", "", "0", "0", "", "")) }
+    // (apartmentName, address, area, numberRooms, owner, contact)
+
+    LaunchedEffect(doneLoading) {
+        delay(10000)
+        if (!doneLoading) failed = true
     }
 
+
+    LaunchedEffect(failed) {
+        if (!failed) {
+            apartmentInfo = getApartmentInfo()
+            doneLoading = true
+            Log.d("Firebase", "apartmentInfo: $apartmentInfo")
+        }
+    }
     // Kiểm tra tất cả các tác vụ đã hoàn thành, sẵn sàng hiển thị hay chưa
-    LaunchedEffect(apartmentInfoLoaded, roomsLoaded, authLoaded) {
-        doneLoading = apartmentInfoLoaded && roomsLoaded && authLoaded && !failed
+    LaunchedEffect(failed) {
+        doneLoading = !failed && doneLoading
     }
 
     if (!doneLoading) {
@@ -149,18 +99,9 @@ fun ApartmentInfoPage(
             onBackClick = { onFunctionChange(0) },
             modifier = modifier
         ) {
-            NameAndAddress(name = apartmentName, address = address)
-            RoomsAndArea(numberRooms = numberRooms, area = area)
-            InfoCardBar(
-                painter1 = painterResource(id = R.drawable.owner),
-                size1 = 0.08f,
-                onClick = { }, //TODO
-                title = "Owners ($ownerCount)",
-                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                size2 = 0.1f,
-                tint2 = MaterialTheme.colorScheme.onSecondary
-            )
-            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            NameAndAddress(name = apartmentInfo[0], address = apartmentInfo[1])
+            RoomsAndArea(numberRooms = apartmentInfo[3].toInt(), area = apartmentInfo[2].toInt())
+            OwnerCard(name = apartmentInfo[4], phone = apartmentInfo[5])
             InfoCardBar(
                 painter1 = painterResource(id = R.drawable.manager),
                 size1 = 0.08f,
@@ -185,7 +126,11 @@ private fun NameAndAddress(
             defaultElevation = 8.dp
         ),
         modifier = Modifier
-            .padding(top = screenWidth * 0.05f, start = screenWidth * 0.05f, end = screenWidth * 0.05f)
+            .padding(
+                top = screenWidth * 0.05f,
+                start = screenWidth * 0.05f,
+                end = screenWidth * 0.05f
+            )
             .fillMaxWidth(),
         colors = CardColors(
             MaterialTheme.colorScheme.secondary,
@@ -238,7 +183,9 @@ fun RoomsAndArea(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = screenWidth * 0.05f)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = screenWidth * 0.05f)
     ) {
         Spacer(modifier = Modifier.width(screenWidth * 0.05f))
         ElevatedCard(
@@ -345,6 +292,70 @@ fun RoomsAndArea(
     }
 }
 
+@Composable
+fun OwnerCard(
+    name: String,
+    phone: String
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        modifier = Modifier
+            .padding(
+                top = screenWidth * 0.05f,
+                start = screenWidth * 0.05f,
+                end = screenWidth * 0.05f
+            )
+            .fillMaxWidth(),
+        colors = CardColors(
+            MaterialTheme.colorScheme.secondary,
+            Color.Unspecified,
+            Color.Unspecified,
+            Color.Unspecified
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(screenWidth * 0.05f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.owner),
+                    contentDescription = "Apartment Information",
+                    modifier = Modifier
+                        .width(screenWidth * 0.08f)
+                        .height(screenWidth * 0.08f)
+                )
+                Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+                Text(
+                    text = "Owner",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSecondary,
+//                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
+            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+            )
+            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            Text(
+                text = "Contact: $phone",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+            )
+        }
+    }
+}
+
 // Bản xem trước với dữ liệu giả
 @Preview(showBackground = true)
 @Composable
@@ -356,18 +367,12 @@ fun ApartmentInfoPreview() {
             onBackClick = { },
             modifier = Modifier
         ) {
-            NameAndAddress(name = "A Weirdly Big Cool Awesome Fabulous Luxurious Apartment", address = "No. 123, XYZ St., ABC City")
-            RoomsAndArea(numberRooms = 785, area = 9999)
-            InfoCardBar(
-                painter1 = painterResource(id = R.drawable.owner),
-                size1 = 0.08f,
-                onClick = { }, //TODO
-                title = "Owners (1)",
-                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                size2 = 0.1f,
-                tint2 = MaterialTheme.colorScheme.onSecondary
+            NameAndAddress(
+                name = "A Weirdly Big Cool Awesome Fabulous Luxurious Apartment",
+                address = "No. 123, XYZ St., ABC City"
             )
-            Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+            RoomsAndArea(numberRooms = 785, area = 9999)
+            OwnerCard(name = "Nguyễn Văn A", phone = "0123456789")
             InfoCardBar(
                 painter1 = painterResource(id = R.drawable.manager),
                 size1 = 0.08f,

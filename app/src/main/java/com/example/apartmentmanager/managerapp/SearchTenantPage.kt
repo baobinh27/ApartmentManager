@@ -86,7 +86,6 @@ private fun NameBar(
     TextField(
         value = name,
         onValueChange = onValueChange,
-        visualTransformation = PasswordVisualTransformation(),
         singleLine = true,
         shape = ShapeDefaults.Large,
         modifier = Modifier.fillMaxWidth(),
