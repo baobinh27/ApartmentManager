@@ -44,5 +44,6 @@ val Red = Color(0xFFFF0000)
 val DarkRed = Color(0xFF8C0000)
 
 val DarkGreen = Color(0xFF006600)
+val LightGreen = Color(0xFF58FF58)
 val Brown = Color(0xFF773300)
 val TransparentBlack = Color(0x33000000)

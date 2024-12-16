@@ -315,6 +315,84 @@ fun generateRandomPassword(length: Int): String {
         .joinToString("")
 }
 
+//suspend fun addAccount(
+//    name: String,
+//    DOB: Date,
+//    phone: String,
+//    hometown: String,
+//    room: String,
+//    dateAdded: Date,
+//    password: String = ""
+//): Pair<String, String> {
+//    val tenantRef = db.collection("tenants")
+//    var isValid = true
+//
+//    val tenantData = hashMapOf(
+//        "dateArrive" to Timestamp(dateAdded),
+//        "dateLeave" to null,
+//        "dateOfBirth" to Timestamp(DOB),
+//        "hometown" to hometown,
+//        "name" to name,
+//        "phone" to phone,
+//        "roomID" to room
+//    )
+//    // Nếu mật khẩu rỗng thì tạo mật khẩu ngẫu nhiên gồm 10 ký tự
+//    val passwordAdd = if (password == "") {generateRandomPassword(10)} else {password}
+//    val authData = hashMapOf(
+//        "isActive" to true,
+//        "username" to phone,
+//        "password" to passwordAdd
+//    )
+//    val countRef = db.collection("apartmentInfo").document("general")
+//    var count = -1;
+//    var returnID = ""
+//    countRef.get().addOnSuccessListener { document ->
+//        count = document.getLong("idCount")?.toInt() ?: 0
+//
+//
+//        if (count == -1) {isValid = false}
+//        var tenantID = (count + 1).toString()
+//        for (i in 1..5 - (count + 1).toString().length) {
+//            tenantID = "0$tenantID"
+//        }
+//        tenantID = "T$tenantID"
+//        returnID = tenantID
+//        tenantRef.document(tenantID)
+//            .set(tenantData)
+//            .addOnSuccessListener {
+//                Log.d("Firebase","Document $tenantID đã được thêm thành công!")
+//            }
+//            .addOnFailureListener { e ->
+//                Log.w("Firebase","Lỗi khi thêm document $tenantID: ${e.message}")
+//                isValid = false
+//            }
+//        db.collection("authentication").document(tenantID)
+//            .set(authData)
+//            .addOnSuccessListener {
+//                Log.d("Firebase","Document $tenantID đã được thêm thành công!")
+//            }
+//            .addOnFailureListener { e ->
+//                Log.w("Firebase","Lỗi khi thêm document $tenantID: ${e.message}")
+//                isValid = false
+//            }
+//        db.collection("Room").document(room).get().addOnSuccessListener {
+//            val roomStatus = it.getLong("roomStatus")?.toInt() ?: 0
+//
+//            db.collection("Room").document(room)
+//                .update("roomStatus", roomStatus + 1)
+//
+//        }.addOnFailureListener {
+//            Log.d("Firestore", "Error getting documents: ", it)
+//            isValid = false
+//        }
+//
+//        countRef.update("idCount", count + 1)
+//    }.addOnFailureListener {
+//        Log.d("Firestore", "Error getting documents: ", it)
+//    }
+//    return if (isValid) {Pair(returnID, passwordAdd)} else {Pair("-1", passwordAdd)}
+//}
+
 suspend fun addAccount(
     name: String,
     DOB: Date,
@@ -323,71 +401,56 @@ suspend fun addAccount(
     room: String,
     dateAdded: Date,
     password: String = ""
-): String {
+): Pair<String, String> {
     val tenantRef = db.collection("tenants")
-    var isValid = true
-
-    val tenantData = hashMapOf(
-        "dateArrive" to Timestamp(dateAdded),
-        "dateLeave" to null,
-        "dateOfBirth" to Timestamp(DOB),
-        "hometown" to hometown,
-        "name" to name,
-        "phone" to phone,
-        "roomID" to room
-    )
-    // Nếu mật khẩu rỗng thì tạo mật khẩu ngẫu nhiên gồm 10 ký tự
-    val passwordAdd = if (password == "") {generateRandomPassword(10)} else {password}
-    val authData = hashMapOf(
-        "isActive" to true,
-        "username" to phone,
-        "password" to passwordAdd
-    )
     val countRef = db.collection("apartmentInfo").document("general")
-    var count = -1;
-    countRef.get().addOnSuccessListener { document ->
-        count = document.getLong("idCount")?.toInt() ?: 0
-    }.addOnFailureListener {
-        Log.d("Firestore", "Error getting documents: ", it)
-    }
 
-    if (count == -1) {isValid = false}
-    var tenantID = (count + 1).toString()
-    for (i in 1..5 - (count + 1).toString().length) {
-        tenantID = "0$tenantID"
-    }
-    tenantID = "T$tenantID$"
+    return try {
+        // Lấy count bằng await
+        val document = countRef.get().await()
+        val count = document.getLong("idCount")?.toInt() ?: -1
+        if (count == -1) return Pair("-1", password)
 
-    tenantRef.document(tenantID)
-        .set(tenantData)
-        .addOnSuccessListener {
-            Log.d("Firebase","Document $tenantID đã được thêm thành công!")
-        }
-        .addOnFailureListener { e ->
-            Log.w("Firebase","Lỗi khi thêm document $tenantID: ${e.message}")
-            isValid = false
-        }
-    db.collection("authentication").document(tenantID)
-        .set(authData)
-        .addOnSuccessListener {
-            Log.d("Firebase","Document $tenantID đã được thêm thành công!")
-        }
-        .addOnFailureListener { e ->
-            Log.w("Firebase","Lỗi khi thêm document $tenantID: ${e.message}")
-            isValid = false
-        }
-    var roomStatus = 0
-    db.collection("Room").document(room).get().addOnSuccessListener {
-        roomStatus = it.getLong("roomStatus")?.toInt() ?: 0
-    }.addOnFailureListener {
-        Log.d("Firestore", "Error getting documents: ", it)
-        isValid = false
+        // Tạo tenantID
+        var tenantID = (count + 1).toString().padStart(5, '0')
+        tenantID = "T$tenantID"
+
+        // Dữ liệu tenant và auth
+        val passwordAdd = if (password.isEmpty()) generateRandomPassword(10) else password
+        val tenantData = hashMapOf(
+            "dateArrive" to Timestamp(dateAdded),
+            "dateLeave" to null,
+            "dateOfBirth" to Timestamp(DOB),
+            "hometown" to hometown,
+            "name" to name,
+            "phone" to phone,
+            "roomID" to room
+        )
+        val authData = hashMapOf(
+            "isActive" to true,
+            "username" to phone,
+            "password" to passwordAdd
+        )
+
+        // Thêm dữ liệu vào Firestore
+        tenantRef.document(tenantID).set(tenantData).await()
+        db.collection("authentication").document(tenantID).set(authData).await()
+
+        // Cập nhật roomStatus
+        val roomDoc = db.collection("Room").document(room).get().await()
+        val roomStatus = roomDoc.getLong("roomStatus")?.toInt() ?: 0
+        db.collection("Room").document(room).update("roomStatus", roomStatus + 1).await()
+
+        // Cập nhật idCount
+        countRef.update("idCount", count + 1).await()
+
+        Pair(tenantID, passwordAdd) // Trả về ID và password
+    } catch (e: Exception) {
+        Log.d("Firestore", "Error: ${e.message}")
+        Pair("-1", password)
     }
-    db.collection("Room").document(room)
-        .update("roomStatus", roomStatus + 1)
-    countRef.update("idCount", count + 1)
-    return if (isValid) {passwordAdd} else {"-1"}
 }
+
 
 suspend fun isValidUser(username: String, password: String): Boolean {
     val db = FirebaseFirestore.getInstance()
