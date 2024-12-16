@@ -94,23 +94,3 @@ fun ExpandBar(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun ExpandBarPreview() {
-    ApartmentManagerTheme {
-        var expanded by remember { mutableStateOf(false) }
-        ExpandBar(
-            onClick = {expanded = !expanded},
-            activated = expanded,
-            cardColor = MaterialTheme.colorScheme.primary,
-            barContent = {
-                Text("Hello")
-            },
-            expandedContent = {
-                Text("World")
-            }
-        )
-    }
-
-}

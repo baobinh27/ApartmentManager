@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.R
+import com.example.apartmentmanager.getManagerInfo
+import com.example.apartmentmanager.getTenantInfo
 import com.example.apartmentmanager.templates.InfoCard
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
@@ -59,24 +62,22 @@ import kotlinx.coroutines.delay
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 fun HomePage(
-    modifier: Modifier,
     onLogOut: () -> Unit,
     lastFunction: Int,
-    onFunctionChange: (Int) -> Unit
+    onFunctionChange: (Int) -> Unit,
+    managerID: String
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val isNightMode = isSystemInDarkTheme()
     val scrollState = rememberScrollState()
-
     val enterFromTop = slideInVertically(initialOffsetY = { it })
     val exitToTop = slideOutVertically(targetOffsetY = { -it })
 
     var showLoginStatus by rememberSaveable { mutableStateOf(true) }
-    var hasShowedLoginStatus by rememberSaveable { mutableStateOf(false) }
     var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
         // Ảnh nền phía sau, chiếm toàn bộ màn hình
         Image(
@@ -90,10 +91,10 @@ fun HomePage(
             color = Color.Black.copy(alpha = 0.2f)
         ) {}
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize().verticalScroll(state = scrollState)
         ) {
-            HeaderPane(modifier, onFunctionChange)
+            HeaderPane(onFunctionChange, managerID)
 
             FlowRow(
                 modifier = Modifier.padding(top = screenWidth * 0.05f)
@@ -107,19 +108,18 @@ fun HomePage(
             }
             SettingBar(onFunctionChange)
             LogOutBar(onClick = {showLogoutDialog = true})
-            Spacer(modifier = modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
 
-        LaunchedEffect(showLoginStatus, hasShowedLoginStatus) {
-            if (!hasShowedLoginStatus && showLoginStatus) {
+        LaunchedEffect(showLoginStatus) {
+            if (showLoginStatus) {
                 delay(2000)
                 showLoginStatus = false
-                hasShowedLoginStatus = true
             }
         }
 
         AnimatedVisibility(
-            visible = showLoginStatus && (lastFunction == -1) && !hasShowedLoginStatus,
+            visible = showLoginStatus && (lastFunction == -1),
             modifier = Modifier.align(Alignment.TopCenter),
             enter = enterFromTop,
             exit = exitToTop
@@ -141,13 +141,26 @@ fun HomePage(
 //25% màn hình bên trên của menu để hiện các thông tin chính
 @Composable
 fun HeaderPane(
-    modifier: Modifier,
-    onFunctionChange: (Int) -> Unit
+    onFunctionChange: (Int) -> Unit,
+    managerID: String
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    var name by rememberSaveable { mutableStateOf("")}
+
+    LaunchedEffect(Unit) {
+        val list = getManagerInfo()
+        if (list.isNotEmpty()) {
+            for (item in list) {
+                if (item[0] == managerID) {
+                    name = item[1]
+                    break
+                }
+            }
+        }
+    }
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .height(screenHeight * 0.25f)
             .clip(ShapeDefaults.ExtraLarge)
@@ -171,16 +184,23 @@ fun HeaderPane(
                 .padding(start = 30.dp, top = 30.dp)
                 .align(Alignment.CenterStart)
         ) {
-            Text(
-                text = "My Apartment",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Text(
-                text = "lorem ipsum.",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            if (name == "") {
+                CircularProgressIndicator(
+                    modifier = Modifier.height(screenWidth * 0.2f).width(screenWidth * 0.2f).padding(screenWidth * 0.1f)
+                )
+            } else {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+                Text(
+                    text = managerID,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
 
         Icon(
@@ -392,7 +412,7 @@ fun LogOutBar(
 @Composable
 fun HomePagePreviewLightMode() {
     ApartmentManagerTheme {
-        HomePage(modifier = Modifier, onLogOut = {}, onFunctionChange = {}, lastFunction = -1)
+        HomePage(onLogOut = {}, onFunctionChange = {}, lastFunction = -1, managerID = "M00001")
 
     }
 }
@@ -401,6 +421,6 @@ fun HomePagePreviewLightMode() {
 @Composable
 fun HomePagePreviewDarkMode() {
     ApartmentManagerTheme {
-        HomePage(modifier = Modifier, onLogOut = {}, onFunctionChange = {}, lastFunction = -1)
+        HomePage(onLogOut = {}, onFunctionChange = {}, lastFunction = -1, managerID = "M00001")
     }
 }

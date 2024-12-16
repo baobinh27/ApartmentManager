@@ -37,14 +37,13 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 //Function 4: Báo cáo tài chính
 @Composable
 fun FinancialReportPage(
-    modifier: Modifier,
+    tenantID: String,
     onFunctionChange: (Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     InfoPage(
         title = "Financial Report",
         onBackClick = { onFunctionChange(0) },
-        modifier = modifier
     ) {
         // Dữ liệu mẫu
         val list = listOf("5,000,000đ", "4,500,000đ", "3,000,000đ", "2,500,000đ", "2,000,000đ", "1,500,000đ", "1,000,000đ", "700,000đ", "600,000đ", "500,000đ")
@@ -230,7 +229,7 @@ private fun RentMonthInfo(
 @Composable
 fun FinancialReportPagePreviewLightMode() {
     ApartmentManagerTheme {
-        FinancialReportPage(modifier = Modifier, onFunctionChange = {})
+        FinancialReportPage(tenantID = "T00001", onFunctionChange = {})
     }
 }
 
@@ -238,6 +237,6 @@ fun FinancialReportPagePreviewLightMode() {
 @Composable
 fun FinancialReportPagePreviewDarkMode() {
     ApartmentManagerTheme {
-        FinancialReportPage(modifier = Modifier, onFunctionChange = {})
+        FinancialReportPage(tenantID = "T00001", onFunctionChange = {})
     }
 }

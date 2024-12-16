@@ -1,6 +1,7 @@
 package com.example.apartmentmanager.tenantapp
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,21 +44,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.apartmentmanager.R
 import com.example.apartmentmanager.getApartmentInfo
+import com.example.apartmentmanager.getManagerInfo
+import com.example.apartmentmanager.templates.ExpandBar
 import com.example.apartmentmanager.templates.FailedLoadingScreen
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
+import com.example.apartmentmanager.templates.ItemList
 import com.example.apartmentmanager.templates.LoadingScreen
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 
 //Function 1: Thông tin chung cư
 @Composable
 fun ApartmentInfoPage(
-    modifier: Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    var showManager by rememberSaveable { mutableStateOf(false) }
+    var managerIDSelected by rememberSaveable { mutableStateOf(listOf<String>()) }
 
     var managerCount by remember { mutableIntStateOf(0) }
 
@@ -62,18 +70,24 @@ fun ApartmentInfoPage(
 
     var apartmentInfo by remember { mutableStateOf(listOf<String>("", "", "0", "0", "", "")) }
     // (apartmentName, address, area, numberRooms, owner, contact)
+    var managerList by remember { mutableStateOf(listOf<List<String>>()) }
+    // listOf (id, name, DOB, phone)
 
     LaunchedEffect(doneLoading) {
         delay(10000)
         if (!doneLoading) failed = true
     }
 
-
     LaunchedEffect(failed) {
         if (!failed) {
             apartmentInfo = getApartmentInfo()
-            doneLoading = true
+            managerList = getManagerInfo()
+            if (apartmentInfo.isNotEmpty() && managerList.isNotEmpty()) {
+                managerCount = managerList.size
+                doneLoading = true
+            }
             Log.d("Firebase", "apartmentInfo: $apartmentInfo")
+            Log.d("Firebase", "managerInfo: $managerList")
         }
     }
     // Kiểm tra tất cả các tác vụ đã hoàn thành, sẵn sàng hiển thị hay chưa
@@ -81,38 +95,108 @@ fun ApartmentInfoPage(
         doneLoading = !failed && doneLoading
     }
 
-    if (!doneLoading) {
+    Box() {
         InfoPage(
             title = "Apartment Information",
             onBackClick = { onFunctionChange(0) },
-            modifier = modifier
         ) {
-            if (failed) {
-                FailedLoadingScreen()
+            if (!doneLoading) {
+                if (failed) {
+                    FailedLoadingScreen()
+                } else {
+                    LoadingScreen()
+                }
             } else {
-                LoadingScreen()
+                NameAndAddress(name = apartmentInfo[0], address = apartmentInfo[1])
+                RoomsAndArea(
+                    numberRooms = apartmentInfo[3].toInt(),
+                    area = apartmentInfo[2].toInt()
+                )
+                OwnerCard(name = apartmentInfo[4], phone = apartmentInfo[5])
+                ExpandBar(
+                    activated = showManager,
+                    onClick = { showManager = !showManager },
+                    barContent = {
+                        Icon(
+                            painter = painterResource(R.drawable.manager),
+                            contentDescription = null,
+                            modifier = Modifier.height(screenWidth * 0.08f)
+                        )
+                        Spacer(modifier = Modifier.width(screenWidth * 0.05f))
+                        Text(
+                            text = "Managers (${managerCount})",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    },
+                    expandedContent = {
+                        for (id in managerList) {
+                            ItemList(
+                                onClick = { managerIDSelected = id }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(
+                                        vertical = screenWidth * 0.025f,
+                                        horizontal = screenWidth * 0.05f
+                                    )
+                                ) {
+                                    Text(id[1])
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(id[0])
+                                }
+                            }
+
+                        }
+                    }
+                )
             }
         }
-    } else {
-        InfoPage(
-            title = "Apartment Information",
-            onBackClick = { onFunctionChange(0) },
-            modifier = modifier
-        ) {
-            NameAndAddress(name = apartmentInfo[0], address = apartmentInfo[1])
-            RoomsAndArea(numberRooms = apartmentInfo[3].toInt(), area = apartmentInfo[2].toInt())
-            OwnerCard(name = apartmentInfo[4], phone = apartmentInfo[5])
-            InfoCardBar(
-                painter1 = painterResource(id = R.drawable.manager),
-                size1 = 0.08f,
-                onClick = {},  //TODO
-                title = "Managers ($managerCount)",
-                icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                size2 = 0.1f,
-                tint2 = MaterialTheme.colorScheme.onSecondary
-            )
+
+        if (managerIDSelected.isNotEmpty()) {
+            Surface(modifier = Modifier.fillMaxSize(), color = Color.Black.copy(alpha = 0.5f)) {}
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(screenWidth * 0.05f)
+                    .align(Alignment.Center).height(screenWidth * 0.5f),
+            ) {
+                Column(
+                    modifier = Modifier.padding(screenWidth * 0.05f).fillMaxWidth()
+                ) {
+                    Text(
+                        text = managerIDSelected[1],
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Text(
+                        text = managerIDSelected[0],
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+                    Text(
+                        text = "Date of birth: ${managerIDSelected[2]}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Text(
+                        text = "Phone: ${managerIDSelected[3]}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+
+                    Spacer(modifier = Modifier.height(screenWidth * 0.05f))
+                    Button(
+                        onClick = {
+                            managerIDSelected = emptyList()
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                    ) {
+                        Text("Done")
+                    }
+                }
+            }
         }
     }
+
 }
 
 @Composable

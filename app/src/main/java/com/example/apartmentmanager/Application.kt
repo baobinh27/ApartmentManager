@@ -83,7 +83,7 @@ fun MainNavigation(
             enter = slideInHorizontally(initialOffsetX = { it }),
             exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
-            ManagerApp(onLogOut = { role = 0 })
+            ManagerApp(managerID = userID, onLogOut = { role = 0 })
         }
     }
 }

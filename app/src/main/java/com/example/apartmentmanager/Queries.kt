@@ -114,6 +114,31 @@ suspend fun getApartmentInfo(): List<String> {
 
     return listOf(apartmentName, address, area.toString(), roomAmount.toString(), owner, contact)
 }
+//lấy danh sách quản lý
+suspend fun getManagerInfo(): List<List<String>> {
+    val managersRef = db.collection("Manager")
+    val managerList = mutableListOf<List<String>>()
+
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    try {
+        val documents = managersRef.get().await()
+        for (document in documents) {
+            val id = document.id
+            val name = document.getString("Name").orEmpty()
+            val dateOfBirth = document.getTimestamp("dateOfBirth")?.toDate()?.toInstant()
+                ?.atZone(ZoneId.systemDefault())?.toLocalDate()?.format(dateFormatter).orEmpty()
+            val phone = document.getString("sdt").orEmpty()
+
+            managerList.add(listOf(id, name, dateOfBirth, phone))
+        }
+        Log.d("Firestore", "Fetched all manager info successfully")
+    } catch (exception: Exception) {
+        Log.e("Firestore", "Error fetching manager documents", exception)
+    }
+
+    return managerList
+}
 //lấy danh sách tất cả phòng
 suspend fun getRoomList(): List<String> {
     val roomsRef = db.collection("Room")
@@ -143,7 +168,7 @@ suspend fun getTenantInfo(tenantID: String): List<String> {
     var roomID = ""
     var hometown = ""
 
-    val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     try {
         val document = tenantsRef.get().await()

@@ -39,7 +39,6 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
 @Composable
 fun SettingsPage(
-    modifier: Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
     var showLanguageSetting by rememberSaveable { mutableStateOf(false) }
@@ -61,7 +60,6 @@ fun SettingsPage(
         InfoPage(
             title = "Settings",
             onBackClick = { onFunctionChange(0) },
-            modifier = modifier
         ) {
             LanguageSetting(
                 showLanguageSetting,
@@ -300,7 +298,7 @@ private fun ThemeSetting(
 @Composable
 fun SettingsPagePreviewLightMode() {
     ApartmentManagerTheme {
-        com.example.apartmentmanager.tenantapp.SettingsPage(modifier = Modifier, onFunctionChange = {})
+        com.example.apartmentmanager.tenantapp.SettingsPage(tenantID = "T00001", onFunctionChange = {})
     }
 }
 
@@ -308,6 +306,6 @@ fun SettingsPagePreviewLightMode() {
 @Composable
 fun SettingsPagePreviewDarkMode() {
     ApartmentManagerTheme {
-        com.example.apartmentmanager.tenantapp.SettingsPage(modifier = Modifier, onFunctionChange = {})
+        com.example.apartmentmanager.tenantapp.SettingsPage(tenantID = "T00001", onFunctionChange = {})
     }
 }

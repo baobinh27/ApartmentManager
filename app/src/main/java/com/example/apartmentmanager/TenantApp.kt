@@ -17,7 +17,6 @@ import com.example.apartmentmanager.tenantapp.*
 @Composable
 fun TenantApp(
     tenantID: String,
-    modifier: Modifier = Modifier,
     onLogOut: () -> Unit
 ) {
     //Chức năng mặc định = 0 (HomePage / Menu)
@@ -37,10 +36,11 @@ fun TenantApp(
         enter = enterFromLeft,
         exit = if (lastFunction == -1) exitToRight else exitToLeft
     ) {
-        HomePage(modifier, onLogOut, lastFunction, onFunctionChange = { f, lastF ->
+        HomePage(onLogOut, lastFunction, onFunctionChange = { f, lastF ->
             lastFunction = function
             function = f
-        })
+        },
+            tenantID = tenantID)
     }
     //onFunctionChange để giúp điều hướng
     //ở HomePage, truyền vào onFunctionChange để gắn cho từng thẻ điều hướng chức năng
@@ -50,7 +50,7 @@ fun TenantApp(
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ApartmentInfoPage(modifier, onFunctionChange = { function = it })
+        ApartmentInfoPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 2,
@@ -64,35 +64,35 @@ fun TenantApp(
         enter = enterFromRight,
         exit = if (function == 0) exitToRight else exitToLeft
     ) {
-        RentStatusPage(modifier, onFunctionChange = { function = it })
+        RentStatusPage(tenantID = tenantID, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 4,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        FinancialReportPage(modifier, onFunctionChange = { function = it })
+        FinancialReportPage(tenantID = tenantID, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 5,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ReportPage(modifier, onFunctionChange = { function = it })
+        ReportPage(tenantID = tenantID, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 6,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        SettingsPage(modifier, onFunctionChange = { function = it })
+        SettingsPage(tenantID = tenantID, onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 7,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        NotificationPage(modifier, onFunctionChange = { function = it })
+        NotificationPage(onFunctionChange = { function = it })
     }
 }
 
@@ -101,7 +101,7 @@ fun TenantApp(
 @Composable
 fun TenantAppPreviewLightMode() {
     ApartmentManagerTheme {
-        TenantApp(modifier = Modifier, onLogOut = {}, tenantID = "T00001")
+        TenantApp(onLogOut = {}, tenantID = "T00001")
     }
 }
 
@@ -109,6 +109,6 @@ fun TenantAppPreviewLightMode() {
 @Composable
 fun TenantAppPreviewDarkMode() {
     ApartmentManagerTheme {
-        TenantApp(modifier = Modifier, onLogOut = {}, tenantID = "T00001")
+        TenantApp(onLogOut = {}, tenantID = "T00001")
     }
 }

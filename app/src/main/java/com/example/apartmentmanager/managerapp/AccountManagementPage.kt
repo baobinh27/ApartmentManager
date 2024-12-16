@@ -29,7 +29,6 @@ import com.example.apartmentmanager.managerapp.accountmanagement.*
 
 @Composable
 fun AccountManagementPage(
-    modifier: Modifier = Modifier,
     onFunctionChange: (Int) -> Unit
 ) {
     var secondaryFunction by rememberSaveable { mutableIntStateOf(0) }

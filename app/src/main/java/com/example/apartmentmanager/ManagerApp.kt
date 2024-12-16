@@ -15,7 +15,7 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 
 @Composable
 fun ManagerApp(
-    modifier: Modifier = Modifier,
+    managerID: String,
     onLogOut: () -> Unit
 ) {
     var function by rememberSaveable { mutableIntStateOf(0) }
@@ -32,28 +32,28 @@ fun ManagerApp(
         enter = enterFromLeft,
         exit = exitToLeft
     ) {
-        HomePage(modifier, onLogOut, onFunctionChange = { function = it }, lastFunction = -1)
+        HomePage(onLogOut, onFunctionChange = { function = it }, lastFunction = -1, managerID = managerID)
     }
     AnimatedVisibility(
         visible = function == 1,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        ApartmentInfoPage(modifier, onFunctionChange = { function = it })
+        ApartmentInfoPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 2,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        RoomsInfoPage(modifier, onFunctionChange = { function = it })
+        RoomsInfoPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 3,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        SearchTenantPage(modifier, onFunctionChange = { function = it })
+        SearchTenantPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 4,
@@ -74,14 +74,14 @@ fun ManagerApp(
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        AccountManagementPage(modifier, onFunctionChange = { function = it })
+        AccountManagementPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 7,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        SettingsPage(modifier, onFunctionChange = { function = it })
+        SettingsPage(onFunctionChange = { function = it })
     }
 }
 
@@ -89,7 +89,7 @@ fun ManagerApp(
 @Composable
 fun ManagerAppPreviewLightMode() {
     ApartmentManagerTheme {
-        ManagerApp(modifier = Modifier, onLogOut = {})
+        ManagerApp(onLogOut = {}, managerID = "M00001")
     }
 }
 
@@ -97,6 +97,6 @@ fun ManagerAppPreviewLightMode() {
 @Composable
 fun ManagerAppPreviewDarkMode() {
     ApartmentManagerTheme {
-        ManagerApp(modifier = Modifier, onLogOut = {})
+        ManagerApp(onLogOut = {}, managerID = "M00001")
     }
 }

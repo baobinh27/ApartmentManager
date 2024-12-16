@@ -31,6 +31,7 @@ import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.R
+import com.example.apartmentmanager.getTenantInfo
 import com.example.apartmentmanager.templates.InfoCard
 import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
@@ -67,10 +69,10 @@ import kotlinx.coroutines.delay
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 fun HomePage(
-    modifier: Modifier,
     onLogOut: () -> Unit,
     lastFunction: Int,
-    onFunctionChange: (Int, Int) -> Unit
+    onFunctionChange: (Int, Int) -> Unit,
+    tenantID: String
 ) {
     val scrollState = rememberScrollState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -98,10 +100,11 @@ fun HomePage(
 
         // Phần nội dung chính
         Column(
-            modifier = modifier.fillMaxSize().verticalScroll(state = scrollState)
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(state = scrollState)
         ) {
-            Spacer(modifier = modifier.height(screenWidth * 0.05f))
-            HeaderPane(modifier, onFunctionChange)
+            HeaderPane(onFunctionChange, tenantID)
 
             FlowRow(
                 modifier = Modifier.padding(top = screenWidth * 0.05f)
@@ -116,7 +119,7 @@ fun HomePage(
 
             SettingBar(onFunctionChange)
             LogOutBar(onClick = {showLogoutDialog = true})
-            Spacer(modifier = modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
 
         LaunchedEffect(showLoginStatus) {
@@ -241,13 +244,18 @@ private fun LoginDialog(onClick: () -> Unit) {
 //25% màn hình bên trên của menu để hiện các thông tin chính
 @Composable
 fun HeaderPane(
-    modifier: Modifier,
-    onFunctionChange: (Int, Int) -> Unit
+    onFunctionChange: (Int, Int) -> Unit,
+    tenantID: String
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    var name by rememberSaveable { mutableStateOf("")}
+
+    LaunchedEffect(Unit) {
+        name = getTenantInfo(tenantID)[0]
+    }
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .height(screenHeight * 0.25f)
             .clip(ShapeDefaults.ExtraLarge)
@@ -268,19 +276,26 @@ fun HeaderPane(
         }
         Column(
             modifier = Modifier
-                .padding(start = 30.dp, top = 30.dp)
+                .padding(start = 30.dp, top = 10.dp)
                 .align(Alignment.CenterStart)
         ) {
-            Text(
-                text = "My Apartment",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Text(
-                text = "lorem ipsum.",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            if (name == "") {
+                CircularProgressIndicator(
+                    modifier = Modifier.height(screenWidth * 0.2f).width(screenWidth * 0.2f).padding(screenWidth * 0.1f)
+                )
+            } else {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
+                Text(
+                    text = tenantID,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
 
         Icon(
@@ -404,11 +419,10 @@ fun LogOutBar(
 fun HomePagePreviewLightMode() {
     ApartmentManagerTheme {
         HomePage(
-            modifier = Modifier,
             onLogOut = {},
             lastFunction = -1,
-            onFunctionChange = { _, _ -> })
-
+            onFunctionChange = { _, _ -> },
+            tenantID = "T00001")
     }
 }
 
@@ -417,9 +431,10 @@ fun HomePagePreviewLightMode() {
 fun HomePagePreviewDarkMode() {
     ApartmentManagerTheme {
         HomePage(
-            modifier = Modifier,
             onLogOut = {},
             lastFunction = -1,
-            onFunctionChange = { _, _ -> })
+            onFunctionChange = { _, _ -> },
+            tenantID = "T00001"
+        )
     }
 }

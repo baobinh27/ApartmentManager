@@ -32,11 +32,10 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 //Function 5: Gửi báo cáo
 @Composable
 fun ReportPage(
-    modifier: Modifier,
+    tenantID: String,
     onFunctionChange: (Int) -> Unit
 ) {
     InfoPage(
-        modifier = modifier,
         onBackClick = { onFunctionChange(0) },
         title = "Send Report"
     ) {
@@ -57,7 +56,7 @@ fun ReportPage(
             )
         ) {
             Column(
-                modifier = modifier.padding(screenWidth * 0.05f)
+                modifier = Modifier.padding(screenWidth * 0.05f)
             ) {
                 Text(
                     text = "Report title",
@@ -65,7 +64,7 @@ fun ReportPage(
                     //modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer(modifier = modifier.height(screenWidth * 0.025f))
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
                 TextField(
                     value = title,
                     onValueChange = { title = it },
@@ -81,14 +80,14 @@ fun ReportPage(
                         focusedIndicatorColor = Color.Transparent
                     ),
                 )
-                Spacer(modifier = modifier.height(screenWidth * 0.05f))
+                Spacer(modifier = Modifier.height(screenWidth * 0.05f))
                 Text(
                     text = "Description",
                     style = MaterialTheme.typography.titleMedium,
                     //modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer(modifier = modifier.height(screenWidth * 0.025f))
+                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
                 TextField(
                     value = content,
                     onValueChange = { content = it },
@@ -104,10 +103,10 @@ fun ReportPage(
                         focusedIndicatorColor = Color.Transparent
                     ),
                 )
-                Spacer(modifier = modifier.height(screenWidth * 0.05f))
+                Spacer(modifier = Modifier.height(screenWidth * 0.05f))
                 Button(
                     onClick = {},
-                    modifier = modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.End)
                 ) {
                     Text("Send")
                 }
@@ -137,7 +136,7 @@ private fun ReportTitle(
 @Composable
 fun ReportPagePreviewLightMode() {
     ApartmentManagerTheme {
-        ReportPage(modifier = Modifier, onFunctionChange = {})
+        ReportPage(tenantID = "T00001", onFunctionChange = {})
     }
 }
 
@@ -145,6 +144,6 @@ fun ReportPagePreviewLightMode() {
 @Composable
 fun ReportPagePreviewDarkMode() {
     ApartmentManagerTheme {
-        ReportPage(modifier = Modifier, onFunctionChange = {})
+        ReportPage(tenantID = "T00001", onFunctionChange = {})
     }
 }

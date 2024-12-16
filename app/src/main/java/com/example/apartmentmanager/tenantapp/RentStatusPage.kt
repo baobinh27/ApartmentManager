@@ -38,9 +38,10 @@ import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 //Function 3: Trang thanh toán
 @Composable
 fun RentStatusPage(
-    modifier: Modifier,
+    tenantID: String,
     onFunctionChange: (Int) -> Unit
 ) {
+
     InfoPage(
         title = "Rent Status",
         onBackClick = { onFunctionChange(0) },
@@ -477,7 +478,7 @@ private fun ReportButton(
 @Composable
 fun RentStatusPagePreviewLightMode() {
     ApartmentManagerTheme {
-        RentStatusPage(modifier = Modifier, onFunctionChange = {})
+        RentStatusPage(tenantID = "T00001", onFunctionChange = {})
     }
 }
 
@@ -485,6 +486,6 @@ fun RentStatusPagePreviewLightMode() {
 @Composable
 fun RentStatusPagePreviewDarkMode() {
     ApartmentManagerTheme {
-        RentStatusPage(modifier = Modifier, onFunctionChange = {})
+        RentStatusPage(tenantID = "T00001", onFunctionChange = {})
     }
 }
