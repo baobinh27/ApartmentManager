@@ -74,24 +74,24 @@ fun SettingsPage(
             title = "Settings",
             onBackClick = { onFunctionChange(0) },
         ) {
-            LanguageSetting(
-                showLanguageSetting,
-                onClick = { showLanguageSetting = !showLanguageSetting },
-                onItemClick = { selectedLanguage = it }
-            )
-            ThemeSetting(
-                showThemeSetting,
-                onClick = { showThemeSetting = !showThemeSetting },
-                onItemClick = { selectedTheme = it },
-                selectedTheme = selectedTheme
-            )
-            InfoCardBar(
-                painter1 = painterResource(R.drawable.notifications),
-                tint1 = Color.Unspecified,
-                size1 = 0.07f,
-                title = "Notifications",
-                onClick = { }
-            )
+//            LanguageSetting(
+//                showLanguageSetting,
+//                onClick = { showLanguageSetting = !showLanguageSetting },
+//                onItemClick = { selectedLanguage = it }
+//            )
+//            ThemeSetting(
+//                showThemeSetting,
+//                onClick = { showThemeSetting = !showThemeSetting },
+//                onItemClick = { selectedTheme = it },
+//                selectedTheme = selectedTheme
+//            )
+//            InfoCardBar(
+//                painter1 = painterResource(R.drawable.notifications),
+//                tint1 = Color.Unspecified,
+//                size1 = 0.07f,
+//                title = "Notifications",
+//                onClick = { }
+//            )
             InfoCardBar(
                 painter1 = painterResource(R.drawable.info),
                 tint1 = MaterialTheme.colorScheme.primary,
@@ -108,14 +108,14 @@ fun SettingsPage(
                 tint2 = MaterialTheme.colorScheme.onSecondary,
                 size2 = 0.07f
             )
-            InfoCardBar(
-                icon1 = Icons.TwoTone.Delete,
-                tint1 = Color.Black,
-                size1 = 0.07f,
-                textColor = Color.Red,
-                title = "Request to leave apartment",
-                onClick = { }
-            )
+//            InfoCardBar(
+//                icon1 = Icons.TwoTone.Delete,
+//                tint1 = Color.Black,
+//                size1 = 0.07f,
+//                textColor = Color.Red,
+//                title = "Request to leave apartment",
+//                onClick = { }
+//            )
         }
     }
 
