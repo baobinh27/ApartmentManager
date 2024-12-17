@@ -55,6 +55,13 @@ fun AccountManagementPage(
     ) {
         ChangePassword(onFunctionChange = {secondaryFunction = 0})
     }
+    AnimatedVisibility(
+        visible = secondaryFunction == 3,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        DeleteAccount(changeSecondaryFun = {secondaryFunction = it})
+    }
 }
 
 @Composable
