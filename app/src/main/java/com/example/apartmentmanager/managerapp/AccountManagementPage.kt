@@ -53,7 +53,7 @@ fun AccountManagementPage(
         enter = slideInHorizontally(initialOffsetX = { it }),
         exit = slideOutHorizontally(targetOffsetX = { it })
     ) {
-        ChangePassword(onFunctionChange = {secondaryFunction = it})
+        ChangePassword(onFunctionChange = {secondaryFunction = 0})
     }
 }
 
