@@ -26,6 +26,7 @@ import com.example.apartmentmanager.templates.InfoCardBar
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
 import com.example.apartmentmanager.managerapp.accountmanagement.*
+import com.example.apartmentmanager.tenantapp.secondarypage.ChangePassword
 
 @Composable
 fun AccountManagementPage(
@@ -46,6 +47,13 @@ fun AccountManagementPage(
         exit = slideOutHorizontally(targetOffsetX = { it })
     ) {
         CreateAccount(changeSecondaryFun = {secondaryFunction = it})
+    }
+    AnimatedVisibility(
+        visible = secondaryFunction == 2,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        ChangePassword(onFunctionChange = {secondaryFunction = it})
     }
 }
 
@@ -72,7 +80,7 @@ private fun Navigation(
         InfoCardBar(
             painter1 = painterResource(R.drawable.key),
             size1 = 0.07f,
-            title = "Change login information",
+            title = "Change user password",
             icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             size2 = 0.07f,
             tint2 = MaterialTheme.colorScheme.onSecondary,
@@ -83,7 +91,7 @@ private fun Navigation(
             icon1 = Icons.Default.Delete,
             size1 = 0.07f,
             tint1 = MaterialTheme.colorScheme.onSecondary,
-            title = "Delete requests (1)",
+            title = "Delete account",
             icon2 = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             size2 = 0.07f,
             tint2 = MaterialTheme.colorScheme.onSecondary,

@@ -60,14 +60,14 @@ fun ManagerApp(
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        //SearchTenantPage(modifier, onFunctionChange = { function = it })
+        UpdateRentPage(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 5,
         enter = enterFromRight,
         exit = exitToRight
     ) {
-        //SearchTenantPage(modifier, onFunctionChange = { function = it })
+        ReportList(onFunctionChange = { function = it })
     }
     AnimatedVisibility(
         visible = function == 6,

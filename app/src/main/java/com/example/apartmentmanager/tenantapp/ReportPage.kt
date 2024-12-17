@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
@@ -58,29 +59,7 @@ fun ReportPage(
             Column(
                 modifier = Modifier.padding(screenWidth * 0.05f)
             ) {
-                Text(
-                    text = "Report title",
-                    style = MaterialTheme.typography.titleMedium,
-                    //modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.height(screenWidth * 0.025f))
-                TextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    singleLine = true,
-                    shape = ShapeDefaults.Large,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                        //.height(60.dp),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent
-                    ),
-                )
-                Spacer(modifier = Modifier.height(screenWidth * 0.05f))
+                ReportTitle(title, onValueChange = {title = it})
                 Text(
                     text = "Description",
                     style = MaterialTheme.typography.titleMedium,
@@ -121,15 +100,28 @@ private fun ReportTitle(
     title: String,
     onValueChange: (String) -> Unit
 ) {
-    Text("Report Title:")
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    Text(
+        text = "Report title",
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+    Spacer(modifier = Modifier.height(screenWidth * 0.025f))
     TextField(
         value = title,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it) },
+        singleLine = true,
+        shape = ShapeDefaults.Large,
         modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        singleLine = true
+            .fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent
+        ),
     )
+    Spacer(modifier = Modifier.height(screenWidth * 0.05f))
 }
 
 @Preview(showBackground = true)

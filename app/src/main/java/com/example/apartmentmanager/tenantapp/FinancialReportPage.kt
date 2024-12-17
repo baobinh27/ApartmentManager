@@ -33,6 +33,8 @@ import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.ItemList
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
+import java.text.NumberFormat
+import java.util.Locale
 
 //Function 4: Báo cáo tài chính
 @Composable
@@ -46,11 +48,18 @@ fun FinancialReportPage(
         onBackClick = { onFunctionChange(0) },
     ) {
         // Dữ liệu mẫu
-        val list = listOf("5,000,000đ", "4,500,000đ", "3,000,000đ", "2,500,000đ", "2,000,000đ", "1,500,000đ", "1,000,000đ", "700,000đ", "600,000đ", "500,000đ")
-        for (i in 1..10) {
+        val month = listOf(11, 10, 9)
+        val elec = listOf(115, 175, 131)
+        val water = listOf(3, 4, 4)
+        val services = 200000
+        val rent = 3500000
+        for (i in 0..2) {
             RentMonthInfo(
-                month = "$i /2024",
-                total = list[i-1]
+                month = "${month[i]}/2024",
+                elec = elec[i],
+                water = water[i],
+                services = services,
+                rent = rent
             )
         }
         Spacer(modifier = Modifier.height(screenWidth * 0.05f))
@@ -60,10 +69,16 @@ fun FinancialReportPage(
 @Composable
 private fun RentMonthInfo(
     month: String,
-    total: String
+    elec: Int,
+    water: Int,
+    services: Int,
+    rent: Int
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     var showDetails by rememberSaveable { mutableStateOf(false) }
+    val total = rent + services + elec*3500 + water*38000
+    val numberFormat = NumberFormat.getNumberInstance(Locale("en", "US"))
+
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -102,7 +117,7 @@ private fun RentMonthInfo(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = total,
+                    text = "${numberFormat.format(total)}đ",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSecondary
                 )
@@ -137,7 +152,7 @@ private fun RentMonthInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "4,500,000đ",
+                            text = "${numberFormat.format(rent)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -158,13 +173,13 @@ private fun RentMonthInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "2 units,",
+                            text = "$water units,",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "80,000đ",
+                            text = "${numberFormat.format(water * 38000)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -186,13 +201,13 @@ private fun RentMonthInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "100 units,",
+                            text = "$elec units,",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "350,000đ",
+                            text = "${numberFormat.format(elec * 3500)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -214,7 +229,7 @@ private fun RentMonthInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "70,000đ",
+                            text = "${numberFormat.format(services)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )

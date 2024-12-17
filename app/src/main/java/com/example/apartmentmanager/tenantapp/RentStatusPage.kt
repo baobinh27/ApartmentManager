@@ -1,6 +1,8 @@
 package com.example.apartmentmanager.tenantapp
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +35,10 @@ import androidx.compose.ui.unit.dp
 import com.example.apartmentmanager.R
 import com.example.apartmentmanager.templates.InfoPage
 import com.example.apartmentmanager.templates.ItemList
+import com.example.apartmentmanager.tenantapp.secondarypage.PaymentTab
 import com.example.apartmentmanager.ui.theme.ApartmentManagerTheme
+import java.text.NumberFormat
+import java.util.Locale
 
 //Function 3: Trang thanh toán
 @Composable
@@ -41,17 +46,33 @@ fun RentStatusPage(
     tenantID: String,
     onFunctionChange: (Int) -> Unit
 ) {
+    var secondary by rememberSaveable { mutableStateOf(0) }
 
-    InfoPage(
-        title = "Rent Status",
-        onBackClick = { onFunctionChange(0) },
+    AnimatedVisibility(
+        visible = secondary == 0,
+        enter = slideInHorizontally(initialOffsetX = { -it }),
+        exit = slideOutHorizontally(targetOffsetX = { -it })
     ) {
-        RoomNumber("P.1215")
-        RentPeriod("10/2024")
-        RentInfo()
-        PaymentButton()
-        ReportButton(onFunctionChange = onFunctionChange)
+        InfoPage(
+            title = "Rent Status",
+            onBackClick = { onFunctionChange(0) },
+        ) {
+            RoomNumber("P.101")
+            RentPeriod("12/2024")
+            RentInfo()
+            PaymentButton(changeSecondary = {secondary = it})
+            ReportButton(onFunctionChange = onFunctionChange)
+        }
     }
+
+    AnimatedVisibility(
+        visible = secondary == 1,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        PaymentTab(changeSecondary = {secondary = it})
+    }
+
 }
 
 @Composable
@@ -152,15 +173,19 @@ private fun RentPeriod(
 
 @Composable
 private fun RentInfo(
-    ElecComsumption: Int = 0,
-    waterComsumption: Int = 0,
-    InternetFee: Int = 0,
-    Service: Int = 0,
-    total: String = "5,000,000đ",
+    ElecComsumption: Int = 123,
+    waterComsumption: Int = 4,
+    //InternetFee: Int = 0,
+    Service: Int = 200000,
+    //total: String = "5,000,000đ",
     rentStatus: List<Int> = listOf(0, 0, 0, 0)
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     var showDetails by rememberSaveable { mutableStateOf(false) }
+    val rent = 3500000
+    val total = rent + Service + ElecComsumption*3500 + waterComsumption*38000
+    val numberFormat = NumberFormat.getNumberInstance(Locale("en", "US"))
+
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -199,7 +224,7 @@ private fun RentInfo(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = total,
+                    text = "${numberFormat.format(total)}đ",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSecondary
                 )
@@ -234,7 +259,7 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "4,500,000đ",
+                            text = "${numberFormat.format(rent)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -255,13 +280,13 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "2 units,",
+                            text = "$waterComsumption units,",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "${waterComsumption},000đ",
+                            text = "${numberFormat.format(waterComsumption * 38000)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -283,13 +308,13 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "100 units,",
+                            text = "$ElecComsumption units,",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
                         Spacer(modifier = Modifier.width(screenWidth * 0.025f))
                         Text(
-                            text = "${ElecComsumption},000đ",
+                            text = "${numberFormat.format(ElecComsumption * 3500)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -311,7 +336,7 @@ private fun RentInfo(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "${Service + InternetFee},000đ",
+                            text = "${numberFormat.format(Service)}đ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -370,7 +395,9 @@ private fun RentInfo(
 }
 
 @Composable
-private fun PaymentButton() {
+private fun PaymentButton(
+    changeSecondary: (Int) -> Unit
+) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -389,7 +416,7 @@ private fun PaymentButton() {
             Color.Unspecified,
             Color.Unspecified
         ),
-        onClick = {}
+        onClick = {changeSecondary(1)}
     ) {
         Row(
             modifier = Modifier.padding(screenWidth * 0.05f),
